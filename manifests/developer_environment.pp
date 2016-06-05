@@ -1,6 +1,7 @@
 class omegaup::developer_environment (
 	$root = '/opt/omegaup',
 	$user = 'vagrant',
+	$mysql_user = 'omegaup',
 ) {
 	include omegaup::java
 
