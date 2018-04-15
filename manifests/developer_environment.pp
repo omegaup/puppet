@@ -46,7 +46,7 @@ class omegaup::developer_environment (
   config_php { 'developer settings':
     ensure   => present,
     settings => {
-      'OMEGAUP_DEVELOPMENT_MODE' => 'true', # lint:ignore:quoted_booleans
+      'OMEGAUP_ENVIRONMENT' => 'development',
     },
     path     => "${root}/frontend/server/config.php",
     require  => Config_php['default settings'],
