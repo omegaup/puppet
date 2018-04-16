@@ -109,6 +109,10 @@ class omegaup (
       'OMEGAUP_DB_HOST'                  => $mysql_host,
       'OMEGAUP_DB_PASS'                  => $mysql_password,
       'OMEGAUP_DB_NAME'                  => 'omegaup',
+      'OMEGAUP_URL'                      => $ssl ? {
+        true                             => "https://${hostname}",
+        false                            => "http://${hostname}",
+      },
       'OMEGAUP_SSLCERT_URL'              => '/etc/omegaup/frontend/certificate.pem',
       'OMEGAUP_CACERT_URL'               => '/etc/omegaup/frontend/certificate.pem',
       'OMEGAUP_GRADER_URL'               => "${grader_host}/run/grade/",

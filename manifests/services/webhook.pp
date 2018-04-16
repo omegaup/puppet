@@ -86,7 +86,7 @@ class omegaup::services::webhook (
       ensure                => present,
       server                => $ssl ? {
         true                => "${hostname}-ssl",
-        true                => $hostname,
+        false               => $hostname,
       },
       ssl                   => $ssl,
       ssl_only              => $ssl,
