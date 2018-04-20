@@ -19,6 +19,7 @@ define omegaup::web_host(
     true  => ['index.php', 'index.html'],
     false => ['index.html'],
   }
+  $gzip_types = 'application/javascript application/json text/html text/css image/x-icon'
   if $ssl {
     exec { "${hostname}.dhparam":
       command => "/usr/bin/openssl dhparam -out /etc/ssl/private/${hostname}.dhparam 2048",
@@ -46,7 +47,7 @@ define omegaup::web_host(
       ssl_dhparam          => "/etc/ssl/private/${hostname}.dhparam",
       index_files          => $index_files,
       include_files        => $include_files,
-      gzip_types           => 'application/javascript text/html text/css image/x-icon',
+      gzip_types           => $gzip_types,
       error_pages          => {
         404 => '/404.html',
       },
@@ -79,9 +80,11 @@ define omegaup::web_host(
       client_max_body_size => '100m',
       server_cfg_prepend   => {
         root => $web_root,
+        gzip => 'on'
       },
       try_files            => $try_files,
       require              => File['/etc/nginx/conf.d/default.conf'],
+      gzip_types           => $gzip_types,
     }
     nginx::resource::server { "${hostname}-ssl":
       ensure            => absent,
@@ -98,7 +101,6 @@ define omegaup::web_host(
       proxy                => undef,
       fastcgi_script       => undef,
       location_cfg_prepend => {
-        gzip               => 'off',
         expires            => '-1',
         fastcgi_param      => 'SCRIPT_FILENAME $document_root$fastcgi_script_name',
         fastcgi_index      => 'index.php',
