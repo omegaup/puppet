@@ -2,7 +2,7 @@
 class omegaup::services {
   remote_file { '/var/lib/omegaup/omegaup-backend.tar.xz':
     url      => 'https://omegaup-dist.s3.amazonaws.com/omegaup-backend.tar.xz',
-    sha1hash => '13c82b09c783abb6eb7bf44a4a1cd77c336a0b25',
+    sha1hash => 'dee412b5d277c15dcf550c14f078f61423b89127',
     mode     => 644,
     owner    => 'root',
     group    => 'root',
