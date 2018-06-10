@@ -65,8 +65,8 @@ class omegaup::developer_environment (
 
   # Selenium
   remote_file { '/var/lib/omegaup/chromedriver_linux64.zip':
-    url      => 'https://chromedriver.storage.googleapis.com/2.33/chromedriver_linux64.zip',
-    sha1hash => '717d67ab192b1c57819528161557ce2b66b9436c',
+    url      => 'https://chromedriver.storage.googleapis.com/2.40/chromedriver_linux64.zip',
+    sha1hash => 'f1fba3c21f39570beff90ccec63450118339de2a',
     mode     => 644,
     owner    => 'root',
     group    => 'root',
