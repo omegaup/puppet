@@ -45,8 +45,7 @@ class { '::omegaup':
   user                    => $user,
   mysql_host              => $mysql_host,
   mysql_password          => $mysql_password,
-  require                 => [Class['::omegaup::database'],
-                              Class['::omegaup::apt_sources']],
+  require                 => [Class['::omegaup::database']],
 }
 
 # vim:expandtab ts=2 sw=2

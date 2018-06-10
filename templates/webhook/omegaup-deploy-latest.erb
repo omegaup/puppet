@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Update the Puppet files
+(cd /etc/puppet/modules/omegaup && git pull --rebase origin master)
+
+# Apply the latest changes.
 puppet apply --detailed-exitcodes \
   /etc/puppet/modules/omegaup/manifests/<%= @manifest_name %>.pp
 

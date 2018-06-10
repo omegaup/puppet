@@ -16,6 +16,7 @@ _COMMIT_RE = re.compile('^/([0-9a-f]{2})([0-9a-f]{38})$')
 _GITHUB_SECRET = None
 _GITHUB_TOKEN = None
 _HOSTNAME = None
+_REMOTE_REF = None
 _SLACK_WEBHOOK_URL = None
 _WEBHOOK_ROOT = '/var/lib/omegaup/webhook'
 
@@ -110,17 +111,17 @@ class GitHubWebhookHandler(http.server.BaseHTTPRequestHandler):
             raw_payload = self.rfile.read(content_len)
             expected_hmac = 'sha1=%s' % hmac.new(_GITHUB_SECRET, raw_payload,
                                                  digestmod='sha1').hexdigest()
-            if self.headers.get('X-Hub-Signature', '') == expected_hmac:
-                payload = json.loads(str(raw_payload, encoding='utf-8'))
-                try:
-                    self.handle_hook_event(
-                        self.headers.get('X-GitHub-Event', 'ping'), payload)
-                    self.send_response(200)
-                except:
-                    logging.exception('Error while handling the event')
-                    self.send_response(500)
-            else:
+            if self.headers.get('X-Hub-Signature', '') != expected_hmac:
                 self.send_response(401)
+                return
+            payload = json.loads(str(raw_payload, encoding='utf-8'))
+            try:
+                self.handle_hook_event(
+                    self.headers.get('X-GitHub-Event', 'ping'), payload)
+                self.send_response(200)
+            except:
+                logging.exception('Error while handling the event')
+                self.send_response(500)
         except:
             logging.exception('Error while reading the payload')
             self.send_response(400)
@@ -155,13 +156,14 @@ class GitHubWebhookHandler(http.server.BaseHTTPRequestHandler):
             logging.exception('Failed to send reply')
 
     def handle_hook_event(self, event, payload):
-        global _QUEUE, _CONDITION
+        global _QUEUE, _CONDITION, _REMOTE_REF
 
         logging.info('Request %s, %r', event, payload)
-        if event == 'push':
-            with _CONDITION:
-                _QUEUE.append(payload['after'])
-                _CONDITION.notify()
+        if event != 'push' or payload['ref'] != _REMOTE_REF:
+            return
+        with _CONDITION:
+            _QUEUE.append(payload['after'])
+            _CONDITION.notify()
 
 
 class DeployThread(threading.Thread):
@@ -211,7 +213,8 @@ def _signal_handler(signum, frame):
 
 
 def main():
-    global _GITHUB_SECRET, _GITHUB_TOKEN, _HOSTNAME, _HTTP_SERVER, _SLACK_WEBHOOK_URL
+    global _GITHUB_SECRET, _GITHUB_TOKEN, _HOSTNAME, _HTTP_SERVER, _REMOTE_REF, \
+            _SLACK_WEBHOOK_URL
 
     logging.basicConfig(level=logging.INFO)
 
@@ -220,6 +223,7 @@ def main():
         _HOSTNAME = config['Hostname']
         _GITHUB_SECRET = bytes(config['GitHub']['Secret'], encoding='utf-8')
         _GITHUB_TOKEN = config['GitHub']['OAuthToken']
+        _REMOTE_REF = 'refs/heads/%s' % config['GitHub']['Branch']
         _SLACK_WEBHOOK_URL = config['Slack']['WebhookURL']
 
     logging.info('Starting the webhook service')

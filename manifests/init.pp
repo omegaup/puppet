@@ -3,6 +3,7 @@ class omegaup (
   $broadcaster_host = 'http://localhost:39613',
   $development_environment = false,
   $github_ensure = present,
+  $github_branch = 'master',
   $github_repo = 'omegaup/omegaup',
   $github_remotes = {},
   $grader_host = 'https://localhost:21680',
@@ -25,10 +26,12 @@ class omegaup (
   # Packages
   package { ['git', 'curl', 'unzip', 'zip', 'sudo', 'python3-pip']:
     ensure  => installed,
+    require => [Class['::omegaup::apt_sources']],
   }
 
   package { 'hhvm':
     ensure  => absent,
+    require => [Class['::omegaup::apt_sources']],
   }
 
   # Common
@@ -52,6 +55,7 @@ class omegaup (
   github { $root:
     ensure  => $github_ensure,
     repo    => $github_repo,
+    branch  => $github_branch,
     owner   => $user,
     group   => $user,
     remotes => $github_remotes,
@@ -249,7 +253,8 @@ class omegaup (
 
   # Log management
   package { 'logrotate':
-    ensure => installed,
+    ensure  => installed,
+    require => [Class['::omegaup::apt_sources']],
   }
   file { '/etc/logrotate.d/omegaup':
     ensure  => 'file',

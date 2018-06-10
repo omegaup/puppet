@@ -2,6 +2,10 @@
 class omegaup::services::webhook (
   $github_oauth_token = undef,
   $github_webhook_secret = undef,
+  $github_branch = defined('$::omegaup::github_branch') ? {
+    true  => $::omegaup::github_branch,
+    false => 'master',
+  },
   $hostname = undef,
   $ssl = undef,
   $manifest_name = 'frontend',
@@ -17,11 +21,11 @@ class omegaup::services::webhook (
   }
   file { '/etc/omegaup/webhook/config.json':
     ensure  => 'file',
-    owner   => 'omegaup',
-    group   => 'omegaup',
-    mode    => '0644',
+    owner   => 'omegaup-deploy',
+    group   => 'omegaup-deploy',
+    mode    => '0640',
     content => template('omegaup/webhook/config.json.erb'),
-    require => File['/etc/omegaup/webhook'],
+    require => [User['omegaup-deploy'], File['/etc/omegaup/webhook']],
   }
   file { '/etc/sudoers.d/omegaup-deploy':
     ensure  => 'file',
@@ -49,7 +53,7 @@ class omegaup::services::webhook (
     ensure  => 'directory',
     owner   => 'omegaup-deploy',
     group   => 'omegaup-deploy',
-    mode    => '0755',
+    mode    => '0750',
     require => [User['omegaup-deploy'], File['/var/lib/omegaup']],
   }
 

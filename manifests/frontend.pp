@@ -18,10 +18,6 @@ file { '/etc/omegaup/frontend':
   ensure  => 'directory',
   require => File['/etc/omegaup'],
 }
-class { '::omegaup':
-  github_ensure  => latest,
-  require        => [Class['::omegaup::apt_sources']],
-}
 class { '::omegaup::apt_sources':
   use_newrelic            => true,
   use_elastic_beats       => true,
@@ -50,6 +46,7 @@ file { '/opt/omegaup-staging':
 github { '/opt/omegaup-staging':
   ensure  => latest,
   repo    => $::omegaup::github_repo,
+  branch  => $::omegaup::github_branch,
   owner   => $omegaup::user,
   group   => $omegaup::user,
   require => File['/opt/omegaup-staging'],

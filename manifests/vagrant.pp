@@ -26,8 +26,7 @@ class { '::omegaup':
   local_database          => true,
   mysql_password          => 'omegaup',
   user                    => 'vagrant',
-  require                 => [Class['::omegaup::database'],
-                              Class['::omegaup::apt_sources']],
+  require                 => [Class['::omegaup::database']],
 }
 
 class { '::omegaup::cron':
