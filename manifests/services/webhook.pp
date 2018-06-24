@@ -6,6 +6,7 @@ class omegaup::services::webhook (
     true  => $::omegaup::github_branch,
     false => 'master',
   },
+  $force_database_migration = false,
   $hostname = undef,
   $ssl = undef,
   $manifest_name = 'frontend',
@@ -13,6 +14,16 @@ class omegaup::services::webhook (
   $slack_webhook_url = undef,
 ) {
   include omegaup::users
+
+  if $force_database_migration {
+    if defined('$::omegaup::development_environment') and $::omegaup::development_environment {
+      $force_database_migration_args = ['--development-environment']
+    } else {
+      $force_database_migration_args = ['--databases', 'omegaup']
+    }
+  } else {
+    $force_database_migration_args = []
+  }
 
   # Configuration
   file { '/etc/omegaup/webhook':

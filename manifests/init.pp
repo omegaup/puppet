@@ -14,7 +14,6 @@ class omegaup (
   $mysql_user = 'omegaup',
   $php_max_children = 36,
   $php_max_requests = 500,
-  $force_database_migration = false,
   $root = '/opt/omegaup',
   $services_ensure = running,
   $ssl = false,
@@ -225,7 +224,7 @@ class omegaup (
   }
 
   # Database
-  if $local_database or $force_database_migration {
+  if $local_database {
     dbmigrate { $root:
       ensure                  => latest,
       development_environment => $development_environment,

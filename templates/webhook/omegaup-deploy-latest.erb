@@ -11,15 +11,20 @@ exitcode=$?
 # From https://puppet.com/docs/puppet/5.3/man/apply.html:
 case ${exitcode} in
 0|2)
-	# 0: The run succeeded with no changes or failures; the system was already in
+  # 0: The run succeeded with no changes or failures; the system was already in
   #    the desired state.
   # 2: The run succeeded, and some resources were changed.
-  exit 0
   ;;
 *)
   # 1: The run failed.
-	# 4: The run succeeded, and some resources failed.
-	# 6: The run succeeded, and included both changes and failures.
+  # 4: The run succeeded, and some resources failed.
+  # 6: The run succeeded, and included both changes and failures.
   exit ${exitcode}
   ;;
 esac
+<% if !@force_database_migration_args.empty? %>
+# Perform a database migration
+(cd /etc/puppet/modules/omegaup && \
+  ./stuff/db-migrate.py <%= @force_database_migration_args.join(" ") %>)
+<% end %>
+exit 0
