@@ -24,7 +24,7 @@ case ${exitcode} in
 esac
 <% if !@force_database_migration_args.empty? %>
 # Perform a database migration
-(cd /etc/puppet/modules/omegaup && \
-  ./stuff/db-migrate.py <%= @force_database_migration_args.join(" ") %>)
+(cd /opt/omegaup && \
+  ./stuff/db-migrate.py migrate <%= @force_database_migration_args.join(" ") %>)
 <% end %>
 exit 0
