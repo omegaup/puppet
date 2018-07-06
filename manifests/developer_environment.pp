@@ -19,7 +19,7 @@ class omegaup::developer_environment (
     provider => 'pear',
   }
   Anchor['php::begin'] -> class { '::php::phpunit':
-    source      => 'https://phar.phpunit.de/phpunit-5.3.4.phar',
+    source      => 'https://phar.phpunit.de/phpunit-5.phar',
     auto_update => false,
     path        => '/usr/bin/phpunit',
   } -> Anchor['php::end']
