@@ -1,1 +1,3 @@
 omegaup-deploy ALL = NOPASSWD: /usr/bin/omegaup-deploy-latest
+
+Defaults:omegaup-deploy always_set_home
