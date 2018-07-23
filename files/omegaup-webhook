@@ -25,28 +25,47 @@ _HTTP_SERVER = None
 _QUEUE = []
 
 
-def _github_report_status(commit, state, description):
-    payload = json.dumps({
+def _github_report_status(commit, deployment_id, state, description):
+    status_payload = json.dumps({
         'state': state,
         'target_url': 'https://%s/webhook/%s' % (_HOSTNAME, commit),
         'description': description,
         'context': 'deployment/%s/push' % (_HOSTNAME,)
     }).encode('utf-8')
+    deployment_payload = json.dumps({
+        'state': state,
+        'log_url': 'https://%s/webhook/%s' % (_HOSTNAME, commit),
+        'description': description
+    }).encode('utf-8')
     headers = {
         'Authorization': 'token %s' % _GITHUB_TOKEN,
+        'Accept': 'application/vnd.github.ant-man-preview+json',
         'Content-Type': 'application/json; charset=utf-8',
-        'Content-Length': str(len(payload)),
         'User-Agent': 'omegaup-webhook',
         'Connection': 'close',
     }
     conn = http.client.HTTPSConnection('api.github.com', 443)
     try:
-        conn.request('POST', '/repos/omegaup/omegaup/statuses/%s' % commit, payload, headers)
-        response = conn.getresponse()
-        logging.info('Response: Status %d %s. Contents: %r', response.status,
-                     response.reason, response.read())
-    except http.client.HTTPException:
-        logging.exception('Failed to send status for commit %s', commit)
+        try:
+            conn.request('POST',
+                         '/repos/omegaup/omegaup/statuses/%s' % commit,
+                         status_payload,
+                         {**headers, **{'Content-Length': str(len(status_payload))}}),
+            response = conn.getresponse()
+            logging.info('Response: Status %d %s. Contents: %r', response.status,
+                         response.reason, response.read())
+        except http.client.HTTPException:
+            logging.exception('Failed to send status for commit %s', commit)
+        try:
+            conn.request('POST',
+                         '/repos/omegaup/omegaup/deployments/%d/statuses' % deployment_id,
+                         deployment_payload,
+                         {**headers, **{'Content-Length': str(len(deployment_payload))}}),
+            response = conn.getresponse()
+            logging.info('Response: Deployment %d %s. Contents: %r', response.status,
+                         response.reason, response.read())
+        except http.client.HTTPException:
+            logging.exception('Failed to send status for deployment %s', deployment_id)
     finally:
         conn.close()
 
@@ -159,10 +178,16 @@ class GitHubWebhookHandler(http.server.BaseHTTPRequestHandler):
         global _QUEUE, _CONDITION, _REMOTE_REF
 
         logging.info('Request %s, %r', event, payload)
-        if event != 'push' or payload['ref'] != _REMOTE_REF:
+        if event != 'deployment':
+            logging.info('Ignoring non-deployment event: %s', event)
+            return
+        if 'refs/heads/%s' % payload['deployment']['ref'] != _REMOTE_REF:
+            logging.info('Ignoring non-%s ref: %s', _REMOTE_REF,
+                         payload['deployment']['ref'])
             return
         with _CONDITION:
-            _QUEUE.append(payload['after'])
+            _QUEUE.append((payload['deployment']['sha'],
+                           payload['deployment']['id']))
             _CONDITION.notify()
 
 
@@ -174,15 +199,16 @@ class DeployThread(threading.Thread):
                 while not _QUEUE:
                     _CONDITION.wait()
 
-                commit = _QUEUE.pop()
-                if commit is None:
-                    logging.info('Received empty commit. Sending shutdown '
+                payload = _QUEUE.pop()
+                if payload is None:
+                    logging.info('Received empty payload. Sending shutdown '
                                  'signal to the server.')
                     _HTTP_SERVER.shutdown()
                     logging.info('Terminating deploy loop.')
                     return
+                commit, deployment_id = payload
                 logging.info('Deploying %s...', commit)
-                _github_report_status(commit, 'pending',
+                _github_report_status(commit, deployment_id, 'pending',
                                       'Starting deployment on %s' % (_HOSTNAME,))
                 logpath = os.path.join(_WEBHOOK_ROOT, commit[:2],
                                        commit[2:])
@@ -194,13 +220,13 @@ class DeployThread(threading.Thread):
                                           stderr=subprocess.STDOUT)
                 if res.returncode != 0:
                     logging.error('Error calling omegaup-deploy-latest for %s', commit)
-                    _github_report_status(commit, 'failure',
+                    _github_report_status(commit, deployment_id, 'failure',
                                           'Deployment on %s failed' % (_HOSTNAME,))
                     _slack_report_status(commit, 'failure')
                     continue
 
                 logging.info('Successfully deployed %s', commit)
-                _github_report_status(commit, 'success',
+                _github_report_status(commit, deployment_id, 'success',
                                       'Deployment on %s succeeded' % (_HOSTNAME,))
                 _slack_report_status(commit, 'success')
 
