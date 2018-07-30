@@ -5,6 +5,7 @@ set -x
 
 STAGING=/opt/omegaup-staging
 JS_DIST=frontend/www/js/dist/
+CSS_DIST=frontend/www/css/dist/
 YARN=node_modules/yarn/bin/yarn
 
 # Compile Vue files. This complicated version is needed to ensure that the
@@ -12,11 +13,12 @@ YARN=node_modules/yarn/bin/yarn
 sudo -u omegaup-www -i /bin/bash -c \
 	"set -e;
    cd \"${STAGING}\";
-   rm -rf \"${STAGING}/${JS_DIST}\";
-   mkdir -p \"${STAGING}/${JS_DIST}\";
+   rm -rf \"${STAGING}/${JS_DIST}\" \"${STAGING}/${CSS_DIST}\";
+   mkdir -p \"${STAGING}/${JS_DIST}\" \"${STAGING}/${CSS_DIST}\";
    COMMIT=\$(git rev-parse HEAD);
-   curl \"https://s3.amazonaws.com/omegaup-build-artifacts/webpack-artifacts/\${COMMIT}.tar.xz\" | \\
-     tar -xJ -C \"${STAGING}/${JS_DIST}\" && exit 0 || echo \"Prebuilt not found. Building locally\";
+   curl \"https://s3.amazonaws.com/omegaup-build-artifacts/webpack-artifacts/\${COMMIT}.tar.xz\" | \
+     tar --xz --extract --no-same-owner --no-same-permissions -C \"${STAGING}/frontend/www\" && \
+     exit 0 || echo \"Prebuilt not found. Building locally\";
    . /opt/nvm/nvm.sh;
    if [ \$(nvm current) = \"none\" ]; then
      nvm install node;
