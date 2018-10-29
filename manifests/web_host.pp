@@ -2,6 +2,7 @@ define omegaup::web_host(
   $hostname = 'localhost',
   $default_server = true,
   $include_files = [],
+  $rewrite_rules = [],
   $try_files = undef,
   $ssl = false,
   $php = true,
@@ -63,6 +64,7 @@ define omegaup::web_host(
         ssl_trusted_certificate => "/etc/letsencrypt/live/${hostname}/fullchain.pem",
       },
       try_files            => $try_files,
+      rewrite_rules        => $rewrite_rules,
       require              => [File['/etc/nginx/conf.d/default.conf'],
                                Exec["${hostname}.dhparam"]],
     }
@@ -82,6 +84,7 @@ define omegaup::web_host(
         root => $web_root,
         gzip => 'on'
       },
+      rewrite_rules        => $rewrite_rules,
       try_files            => $try_files,
       require              => File['/etc/nginx/conf.d/default.conf'],
       gzip_types           => $gzip_types,

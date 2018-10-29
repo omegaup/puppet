@@ -23,6 +23,9 @@ class omegaup::org_web (
     php            => false,
     ssl            => $ssl,
     web_root       => $org_webroot,
+    rewrite_rules  => [
+      '^/donate(/.*)?$ /#donate permanent',
+    ],
   }
 }
 
