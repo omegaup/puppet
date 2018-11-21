@@ -66,8 +66,13 @@ exec { 'omegaup-uprev':
   require     => User['omegaup-www'],
   refreshonly => true,
 }
-exec { 'copy-vue':
+exec { 'copy-js':
   command     => '/usr/bin/rsync -a --delete /opt/omegaup-staging/frontend/www/js/dist/ /opt/omegaup/frontend/www/js/dist/',
+  subscribe   => [Exec['omegaup-uprev'], Github[$::omegaup::root]],
+  refreshonly => true,
+}
+exec { 'copy-css':
+  command     => '/usr/bin/rsync -a --delete /opt/omegaup-staging/frontend/www/css/dist/ /opt/omegaup/frontend/www/css/dist/',
   subscribe   => [Exec['omegaup-uprev'], Github[$::omegaup::root]],
   refreshonly => true,
 }
