@@ -10,7 +10,7 @@ class omegaup::filebeat (
     ensure   => 'file',
     owner    => 'root',
     group    => 'root',
-    mode     => '0600',
+    mode     => '600',
     content  => template($template),
     require  => Package['filebeat'],
     notify   => Service['filebeat'],

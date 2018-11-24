@@ -34,7 +34,7 @@ class omegaup::services::webhook (
     ensure  => 'file',
     owner   => 'omegaup-deploy',
     group   => 'omegaup-deploy',
-    mode    => '0640',
+    mode    => '640',
     content => template('omegaup/webhook/config.json.erb'),
     require => [User['omegaup-deploy'], File['/etc/omegaup/webhook']],
   }
@@ -43,7 +43,7 @@ class omegaup::services::webhook (
     source  => 'puppet:///modules/omegaup/sudoers-omegaup-deploy',
     owner   => 'root',
     group   => 'root',
-    mode    => '0440',
+    mode    => '440',
     require => [User['omegaup-deploy'], Package['sudo']],
   }
   file { '/usr/bin/omegaup-webhook':
@@ -51,20 +51,20 @@ class omegaup::services::webhook (
     source  => 'puppet:///modules/omegaup/omegaup-webhook',
     owner   => 'root',
     group   => 'root',
-    mode    => '0755',
+    mode    => '755',
   }
   file { '/usr/bin/omegaup-deploy-latest':
     ensure  => 'file',
     content => template('omegaup/webhook/omegaup-deploy-latest.erb'),
     owner   => 'root',
     group   => 'root',
-    mode    => '0755',
+    mode    => '755',
   }
   file { '/var/lib/omegaup/webhook':
     ensure  => 'directory',
     owner   => 'omegaup-deploy',
     group   => 'omegaup-deploy',
-    mode    => '0750',
+    mode    => '750',
     require => [User['omegaup-deploy'], File['/var/lib/omegaup']],
   }
 
@@ -72,7 +72,7 @@ class omegaup::services::webhook (
   file { '/etc/systemd/system/omegaup-webhook.service':
     ensure  => 'file',
     source  => 'puppet:///modules/omegaup/omegaup-webhook.service',
-    mode    => '0644',
+    mode    => '644',
     owner   => 'root',
     group   => 'root',
     require => File['/usr/bin/omegaup-webhook'],

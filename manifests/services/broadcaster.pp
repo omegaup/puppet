@@ -17,7 +17,7 @@ class omegaup::services::broadcaster (
     ensure  => 'file',
     owner   => 'omegaup',
     group   => 'omegaup',
-    mode    => '0600',
+    mode    => '600',
     content => template('omegaup/broadcaster/config.json.erb'),
     require => File['/etc/omegaup/broadcaster'],
   }
@@ -25,7 +25,7 @@ class omegaup::services::broadcaster (
     hostname      => $hostname,
     password      => $keystore_password,
     owner         => 'omegaup',
-    mode          => '0600',
+    mode          => '600',
     separate_cert => '/etc/omegaup/broadcaster/certificate.pem',
     require       => [File['/etc/omegaup/broadcaster'], User['omegaup']],
   }
@@ -43,7 +43,7 @@ class omegaup::services::broadcaster (
   file { '/etc/systemd/system/omegaup-broadcaster.service':
     ensure => 'file',
     source => 'puppet:///modules/omegaup/omegaup-broadcaster.service',
-    mode   => '0644',
+    mode   => '644',
     owner  => 'root',
     group  => 'root',
   }

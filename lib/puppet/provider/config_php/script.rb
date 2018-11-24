@@ -84,7 +84,7 @@ Puppet::Type.type(:config_php).provide(:file, :parent => Puppet::Provider::Confi
 
 	def mode
 		begin
-			return File.stat(@resource[:path]).mode & 0777
+			return File.stat(@resource[:path]).mode & 0o777
 		rescue
 			return :absent
 		end

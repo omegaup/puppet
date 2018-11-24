@@ -155,7 +155,7 @@ class omegaup (
   remote_file { '/var/lib/omegaup/cppreference.tar.gz':
     url      => 'http://upload.cppreference.com/mwiki/images/3/37/html_book_20170409.tar.gz',
     sha1hash => '4708fb287544e8cfd9d6be56264384016976df94',
-    mode     => 644,
+    mode     => '644',
     owner    => 'root',
     group    => 'root',
     notify   => Exec['extract-cppreference'],
@@ -183,7 +183,7 @@ class omegaup (
   remote_file { '/var/lib/omegaup/freepascal-doc.tar.gz':
     url      => 'ftp://ftp.hu.freepascal.org/pub/fpc/dist/3.0.2/docs/doc-html.tar.gz',
     sha1hash => 'b9b9dc3d624d3dd2699e008aa10bd0181d2bda77',
-    mode     => 644,
+    mode     => '644',
     owner    => 'root',
     group    => 'root',
     notify   => Exec['extract-freepascal-doc'],
@@ -259,7 +259,7 @@ class omegaup (
   file { '/etc/logrotate.d/omegaup':
     ensure  => 'file',
     source  => 'puppet:///modules/omegaup/omegaup.logrotate',
-    mode    => 0644,
+    mode    => '644',
     owner   => 'root',
     group   => 'root',
     require => Package['logrotate'],

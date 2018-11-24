@@ -67,7 +67,7 @@ class omegaup::developer_environment (
   remote_file { '/var/lib/omegaup/chromedriver_linux64.zip':
     url      => 'https://chromedriver.storage.googleapis.com/2.43/chromedriver_linux64.zip',
     sha1hash => '63bce01580d6bc488aa185d572500f342f10eeef',
-    mode     => 644,
+    mode     => '644',
     owner    => 'root',
     group    => 'root',
     notify   => Exec['chromedriver'],
@@ -93,7 +93,7 @@ class omegaup::developer_environment (
   remote_file { '/var/lib/omegaup/geckodriver_linux64.tar.gz':
     url      => 'https://github.com/mozilla/geckodriver/releases/download/v0.19.1/geckodriver-v0.19.1-linux64.tar.gz',
     sha1hash => '9284c82e1a6814ea2a63841cd532d69b87eb0d6e',
-    mode     => 644,
+    mode     => '644',
     owner    => 'root',
     group    => 'root',
     notify   => Exec['geckodriver'],

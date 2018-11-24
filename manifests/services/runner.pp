@@ -11,7 +11,7 @@ class omegaup::services::runner (
   remote_file { '/var/lib/omegaup/omegajail-xenial-distrib-x86_64.tar.bz2':
     url      => 'https://omegaup-omegajail.s3.amazonaws.com/omegajail-xenial-distrib-x86_64.tar.bz2',
     sha1hash => '35c7c21fc58e904ca8a62882654bfefe1b6e9aba',
-    mode     => 644,
+    mode     => '644',
     owner    => 'root',
     group    => 'root',
     require  => File['/var/lib/omegaup'],
@@ -36,7 +36,7 @@ class omegaup::services::runner (
     ensure  => 'file',
     owner   => 'omegaup',
     group   => 'omegaup',
-    mode    => '0644',
+    mode    => '644',
     content => template('omegaup/runner/config.json.erb'),
     require => File['/etc/omegaup/runner'],
   }
@@ -44,7 +44,7 @@ class omegaup::services::runner (
     hostname      => $hostname,
     password      => $keystore_password,
     owner         => 'omegaup',
-    mode          => '0600',
+    mode          => '600',
     separate_cert => '/etc/omegaup/runner/certificate.pem',
     require       => [File['/etc/omegaup/runner'], User['omegaup']],
   }
@@ -67,7 +67,7 @@ class omegaup::services::runner (
   # Service
   file { '/etc/systemd/system/omegaup-runner.service':
     ensure  => 'file',
-    mode    => '0644',
+    mode    => '644',
     owner   => 'root',
     group   => 'root',
     content => template('omegaup/runner/omegaup-runner.service.erb'),

@@ -14,7 +14,7 @@ file { '/etc/omegaup': ensure => 'directory' }
 omegaup::certmanager::cert { '/etc/omegaup/frontend/certificate.pem':
   hostname => 'localhost',
   owner    => 'www-data',
-  mode     => '0600',
+  mode     => '600',
   require  => [File['/etc/omegaup/frontend'], User['www-data']],
 }
 file { '/etc/omegaup/frontend':

@@ -2,7 +2,7 @@
 file { '/usr/sbin/policy-rc.d':
   ensure  => present
   content => "#!/bin/sh\ncase \"${1}\" in\n  udev|systemd-logind) exit 101;;\nesac\n",
-  mode    => '0755',
+  mode    => '755',
 }
 # Ubuntu on Windows does not support Upstart. Fall back to 'init' for services.
 Service {
@@ -35,7 +35,7 @@ file { ['/etc/omegaup/frontend', '/etc/omegaup/grader']:
 }
 omegaup::certmanager::cert { '/etc/omegaup/frontend/certificate.pem':
   hostname => 'localhost',
-  mode     => '0600',
+  mode     => '600',
   owner    => 'www-data',
   require  => [File['/etc/omegaup/frontend'], User['www-data']],
 }

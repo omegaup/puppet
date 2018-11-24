@@ -25,7 +25,7 @@ class omegaup::services::grader (
   remote_file { '/usr/share/java/libinteractive.jar':
     url      => 'https://github.com/omegaup/libinteractive/releases/download/v2.0.22/libinteractive.jar',
     sha1hash => '3ef97034999f00ce31fece791466b4f1d1d9f2ff',
-    mode     => 644,
+    mode     => '644',
     owner    => 'root',
     group    => 'root',
     notify   => Exec['refresh-libinteractive'],
@@ -46,7 +46,7 @@ class omegaup::services::grader (
     ensure  => 'file',
     owner   => 'omegaup',
     group   => 'omegaup',
-    mode    => '0600',
+    mode    => '600',
     content => template('omegaup/grader/config.json.erb'),
     require => File['/etc/omegaup/grader'],
   }
@@ -54,7 +54,7 @@ class omegaup::services::grader (
     hostname      => $hostname,
     password      => $keystore_password,
     owner         => 'omegaup',
-    mode          => '0600',
+    mode          => '600',
     separate_cert => '/etc/omegaup/grader/certificate.pem',
     require       => [File['/etc/omegaup/grader'], User['omegaup']],
   }
@@ -80,7 +80,7 @@ class omegaup::services::grader (
   # Service
   file { '/etc/systemd/system/omegaup-grader.service':
     ensure => 'file',
-    mode   => '0644',
+    mode   => '644',
     owner  => 'root',
     group  => 'root',
     content => template('omegaup/grader/omegaup-grader.service.erb'),

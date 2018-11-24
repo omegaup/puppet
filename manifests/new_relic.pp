@@ -7,7 +7,7 @@ class omegaup::new_relic (
     ensure  => 'file',
     owner   => 'root',
     group   => 'root',
-    mode    => '0644',
+    mode    => '644',
     content => template('omegaup/newrelic/newrelic-infra.yml.erb'),
     notify  => Service['newrelic-infra'],
   }

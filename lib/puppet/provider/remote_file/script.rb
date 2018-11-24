@@ -43,7 +43,7 @@ Puppet::Type.type(:remote_file).provide(:git, :parent => Puppet::Provider::Remot
     if !File.exists?(@resource[:path])
       return :absent
     end
-    "%o" % (File.stat(@resource[:path]).mode & 0o7777)
+    "%o" % (File.stat(@resource[:path]).mode & 0o777)
   end
 
   def mode=(value)

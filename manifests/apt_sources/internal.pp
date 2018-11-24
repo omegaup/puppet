@@ -15,9 +15,6 @@ class omegaup::apt_sources::internal (
     key      => '573BFD6B3D8FBC641079A6ABABF5BD827BD9BF62',
   }
 
-  # omegaUp
-  apt::ppa { 'ppa:omegaup/omegaup': }
-
   # NPM/yarn
   apt::source { 'nodesource':
     location => 'https://deb.nodesource.com/node_6.x',

@@ -10,7 +10,7 @@ host { 'localhost':
 
 omegaup::certmanager::cert { '/etc/omegaup/frontend/certificate.pem':
   owner    => 'www-data',
-  mode     => '0600',
+  mode     => '600',
   require  => [File['/etc/omegaup/frontend'], User['www-data']],
   hostname => hiera('omegaup_hostname'),
 }

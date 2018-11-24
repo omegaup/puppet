@@ -9,7 +9,7 @@ class omegaup::certmanager (
     source => 'puppet:///modules/omegaup/certmanager',
     owner  => 'root',
     group  => 'root',
-    mode   => '0700',
+    mode   => '700',
   }
   file { $ssl_root:
     ensure => 'directory',

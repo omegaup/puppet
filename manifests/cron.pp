@@ -12,14 +12,14 @@ class omegaup::cron (
     ensure => 'directory',
     owner   => 'omegaup-cron',
     group   => 'omegaup-cron',
-    mode    => '0600',
+    mode    => '600',
     require => User['omegaup-cron'],
   }
   file { '/home/omegaup-cron/.my.cnf':
     ensure  => 'file',
     owner   => 'omegaup-cron',
     group   => 'omegaup-cron',
-    mode    => '0600',
+    mode    => '600',
     content => template('omegaup/cron/my.cnf.template'),
     require => [File['/home/omegaup-cron'], User['omegaup-cron']],
   }
@@ -27,7 +27,7 @@ class omegaup::cron (
     ensure  => 'file',
     owner   => 'omegaup-cron',
     group   => 'omegaup-cron',
-    mode    => '0644',
+    mode    => '644',
     require => [File['/var/log/omegaup'], User['omegaup-cron']],
   }
 
