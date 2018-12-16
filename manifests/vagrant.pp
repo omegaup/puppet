@@ -33,9 +33,7 @@ class { '::omegaup::cron':
   mysql_password => 'omegaup',
   require        => Class['::omegaup'],
 }
-class { '::omegaup::services':
-  require        => Class['::omegaup'],
-}
+class { '::omegaup::services': }
 class { '::omegaup::services::grader':
   keystore_password => 'omegaup',
   mysql_password    => 'omegaup',

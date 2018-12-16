@@ -79,11 +79,12 @@ class omegaup::services::grader (
 
   # Service
   file { '/etc/systemd/system/omegaup-grader.service':
-    ensure => 'file',
-    mode   => '644',
-    owner  => 'root',
-    group  => 'root',
+    ensure  => 'file',
+    mode    => '644',
+    owner   => 'root',
+    group   => 'root',
     content => template('omegaup/grader/omegaup-grader.service.erb'),
+    notify  => Exec['systemctl daemon-reload'],
   }
   service { 'omegaup-grader':
     ensure    => $services_ensure,

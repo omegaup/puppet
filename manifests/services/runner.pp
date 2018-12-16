@@ -71,6 +71,7 @@ class omegaup::services::runner (
     owner   => 'root',
     group   => 'root',
     content => template('omegaup/runner/omegaup-runner.service.erb'),
+    notify  => Exec['systemctl daemon-reload'],
   }
   service { 'omegaup-runner':
     ensure    => $services_ensure,

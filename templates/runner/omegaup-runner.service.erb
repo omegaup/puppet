@@ -9,6 +9,7 @@ Group=omegaup
 PermissionsStartOnly=true
 ExecStartPre=/var/lib/omegajail/bin/omegajail-setup
 ExecStart=/usr/bin/omegaup-runner <%= @runner_flags %>
+ExecReload=/bin/kill -s HUP $MAINPID
 WorkingDirectory=/var/lib/omegaup
 Restart=always
 

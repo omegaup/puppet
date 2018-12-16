@@ -10,6 +10,7 @@ Type=simple
 User=omegaup
 Group=omegaup
 ExecStart=/usr/bin/omegaup-grader
+ExecReload=/bin/kill -s HUP $MAINPID
 WorkingDirectory=/var/lib/omegaup
 Restart=always
 

@@ -8,6 +8,48 @@
 	create 0644 www-data www-data
 }
 
+/var/log/omegaup/service.log /var/log/omegaup/tracing.json {
+	weekly
+	missingok
+	rotate 52
+	compress
+	delaycompress
+	dateext
+	create 0644 omegaup omegaup
+	sharedscripts
+	postrotate
+		systemctl reload omegaup-grader
+	endscript
+}
+
+/var/log/omegaup/broadcaster.log /var/log/omegaup/broadcaster.tracing.json {
+	weekly
+	missingok
+	rotate 52
+	compress
+	delaycompress
+	dateext
+	create 0644 omegaup omegaup
+	sharedscripts
+	postrotate
+		systemctl reload omegaup-broadcaster
+	endscript
+}
+
+/var/log/omegaup/runner.log /var/log/omegaup/runner.tracing.json {
+	weekly
+	missingok
+	rotate 52
+	compress
+	delaycompress
+	dateext
+	create 0644 omegaup omegaup
+	sharedscripts
+	postrotate
+		systemctl reload omegaup-runner
+	endscript
+}
+
 /var/log/omegaup/cron.log {
 	weekly
 	missingok

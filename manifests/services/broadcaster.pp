@@ -46,6 +46,7 @@ class omegaup::services::broadcaster (
     mode   => '644',
     owner  => 'root',
     group  => 'root',
+    notify => Exec['systemctl daemon-reload'],
   }
   service { 'omegaup-broadcaster':
     ensure    => $services_ensure,
