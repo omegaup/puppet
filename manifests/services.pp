@@ -43,7 +43,7 @@ class omegaup::services {
   }
 
   exec { 'omegaup-migrate-problem':
-    command     => '/usr/bin/unxz --force --keep /usr/bin/omegaup-migrate-problem.xz',
+    command     => '/usr/bin/unxz --force --keep /usr/bin/omegaup-migrate-problem.xz && chmod 755 /usr/bin/omegaup-migrate-problem',
     user        => 'root',
     notify      => File['/usr/bin/omegaup-migrate-problem'],
     refreshonly => true,
@@ -63,7 +63,7 @@ class omegaup::services {
   }
 
   exec { 'omegaup-update-problem':
-    command     => '/usr/bin/unxz --force --keep /usr/bin/omegaup-update-problem.xz',
+    command     => '/usr/bin/unxz --force --keep /usr/bin/omegaup-update-problem.xz && chmod 755 /usr/bin/omegaup-update-problem',
     user        => 'root',
     notify      => File['/usr/bin/omegaup-update-problem'],
     refreshonly => true,
