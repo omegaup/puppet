@@ -70,7 +70,7 @@ class omegaup (
   }
 
   # Web application
-  file { ['/var/lib/omegaup/problems', '/var/lib/omegaup/problems.git']:
+  file { '/var/lib/omegaup/problems.git':
     ensure  => 'directory',
     owner   => 'www-data',
     group   => 'www-data',
