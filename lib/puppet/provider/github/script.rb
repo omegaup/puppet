@@ -25,11 +25,15 @@ Puppet::Type.type(:github).provide(:git, :parent => Puppet::Provider::GitHub) do
       execute([command(:git), 'fetch', '-q',
                @resource[:origin], @resource[:branch]],
               { :failonfail => true, :uid => uid, :gid => gid })
-      head, fetch_head = execute([command(:git), 'rev-parse',
-                                  'HEAD^{commit}', 'FETCH_HEAD^{commit}'],
-                                 { :failonfail => true, :uid => uid,
-                                   :gid => gid }).lines()
-      if head != fetch_head
+      begin
+        head, fetch_head = execute([command(:git), 'rev-parse',
+                                    'HEAD^{commit}', 'FETCH_HEAD^{commit}'],
+                                   { :failonfail => true, :uid => uid,
+                                     :gid => gid }).lines()
+        if head != fetch_head
+          return false
+        end
+      rescue Puppet::ExecutionFailure
         return false
       end
       @resource[:remotes].to_h.each do |name, repo|
