@@ -111,6 +111,39 @@ class omegaup::services::grader (
       Package['libhttp-parser2.1', 'libssh2-1'],
     ],
   }
+
+  # Git service
+  file { '/var/log/omegaup/gitserver.log':
+    ensure  => 'file',
+    owner   => 'www-data',
+    group   => 'www-data',
+    require => File['/var/log/omegaup'],
+  }
+  file { '/etc/systemd/system/omegaup-gitserver.service':
+    ensure  => 'file',
+    mode    => '644',
+    owner   => 'root',
+    group   => 'root',
+    content => template('omegaup/grader/omegaup-gitserver.service.erb'),
+    notify  => Exec['systemctl daemon-reload'],
+  }
+  service { 'omegaup-gitserver':
+    ensure    => $services_ensure,
+    enable    => true,
+    provider  => 'systemd',
+    subscribe => [
+      File[
+        '/usr/bin/omegaup-gitserver', '/var/log/omegaup/gitserver.log',
+        '/etc/systemd/system/omegaup-gitserver.service'
+      ],
+    ],
+    require   => [
+      File[
+        '/etc/systemd/system/omegaup-gitserver.service',
+        '/var/lib/omegaup/problems.git'
+      ],
+    ],
+  }
 }
 
 # vim:expandtab ts=2 sw=2

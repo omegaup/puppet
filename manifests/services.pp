@@ -72,6 +72,26 @@ class omegaup::services {
   file { '/usr/bin/omegaup-update-problem':
     require => Exec['omegaup-update-problem'],
   }
+
+  remote_file { '/usr/bin/omegaup-gitserver.xz':
+    url      => 'https://github.com/omegaup/gitserver/releases/download/v1.3.1/omegaup-gitserver.xz',
+    sha1hash => '2407bd44c7a4650bf4e51c93f4cbf312e4026dfc',
+    mode     => '644',
+    owner    => 'root',
+    group    => 'root',
+    notify   => Exec['omegaup-gitserver'],
+  }
+
+  exec { 'omegaup-gitserver':
+    command     => '/usr/bin/unxz --force --keep /usr/bin/omegaup-gitserver.xz && chmod 755 /usr/bin/omegaup-gitserver',
+    user        => 'root',
+    notify      => File['/usr/bin/omegaup-gitserver'],
+    refreshonly => true,
+  }
+
+  file { '/usr/bin/omegaup-gitserver':
+    require => Exec['omegaup-gitserver'],
+  }
 }
 
 # vim:expandtab ts=2 sw=2

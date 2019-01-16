@@ -1,0 +1,15 @@
+[Unit]
+Description=omegaUp git service
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+ExecStart=/usr/bin/omegaup-gitserver -allow-direct-push-to-master -root=/var/lib/omegaup/problems.git -log-file=/var/log/omegaup/gitserver.log
+ExecReload=/bin/kill -s HUP $MAINPID
+WorkingDirectory=/var/lib/omegaup
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
