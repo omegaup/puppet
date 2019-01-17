@@ -5,6 +5,7 @@ class omegaup::services::grader (
   $embedded_runner = true,
   $broadcaster_host = 'https://localhost:32672',
   $frontend_host = 'http://localhost',
+  $gitserver_shared_token = $::omegaup::gitserver_shared_token,
   $keystore_password = 'omegaup',
   $local_database = true,
   $mysql_db = 'omegaup',

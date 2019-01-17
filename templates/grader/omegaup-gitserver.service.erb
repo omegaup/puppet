@@ -6,7 +6,7 @@ After=network.target
 Type=simple
 User=www-data
 Group=www-data
-ExecStart=/usr/bin/omegaup-gitserver -allow-direct-push-to-master -root=/var/lib/omegaup/problems.git -log-file=/var/log/omegaup/gitserver.log
+ExecStart=/usr/bin/omegaup-gitserver -allow-direct-push-to-master -root=/var/lib/omegaup/problems.git -log-file=/var/log/omegaup/gitserver.log<% if @gitserver_shared_token %> -public-key "" -secret-token <%= @gitserver_shared_token %><% end %>
 ExecReload=/bin/kill -s HUP $MAINPID
 WorkingDirectory=/var/lib/omegaup
 Restart=always

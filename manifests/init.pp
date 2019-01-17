@@ -6,6 +6,7 @@ class omegaup (
   $github_branch = 'master',
   $github_repo = 'omegaup/omegaup',
   $github_remotes = {},
+  $gitserver_shared_token = undef,
   $grader_host = 'https://localhost:21680',
   $hostname = 'localhost',
   $local_database = false,
@@ -123,6 +124,10 @@ class omegaup (
       'OMEGAUP_GRADER_BROADCAST_URL'     => "${grader_host}/broadcast/",
       'OMEGAUP_GRADER_RELOAD_CONFIG_URL' => "${grader_host}/reload-config/",
       'OMEGAUP_GRADER_STATUS_URL'        => "${grader_host}/grader/status/",
+      'OMEGAUP_GITSERVER_SECRET_TOKEN'   => $gitserver_shared_token ? {
+        undef                            => '',
+        default                          => $gitserver_shared_token,
+      },
     }, $additional_php_config_settings),
     path     => "${root}/frontend/server/config.php",
     owner    => $user,

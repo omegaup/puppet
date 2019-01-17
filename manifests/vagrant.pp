@@ -26,6 +26,7 @@ class { '::omegaup':
   local_database          => true,
   mysql_password          => 'omegaup',
   user                    => 'vagrant',
+  gitserver_shared_token  => 'gitserversharedtoken',
   require                 => [Class['::omegaup::database']],
 }
 
