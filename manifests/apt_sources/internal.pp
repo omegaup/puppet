@@ -17,7 +17,7 @@ class omegaup::apt_sources::internal (
 
   # NPM/yarn
   apt::source { 'nodesource':
-    location => 'https://deb.nodesource.com/node_6.x',
+    location => 'https://deb.nodesource.com/node_11.x',
     include  => {
       src    => false,
     },
