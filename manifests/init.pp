@@ -120,10 +120,7 @@ class omegaup (
       },
       'OMEGAUP_SSLCERT_URL'              => '/etc/omegaup/frontend/certificate.pem',
       'OMEGAUP_CACERT_URL'               => '/etc/omegaup/frontend/certificate.pem',
-      'OMEGAUP_GRADER_URL'               => "${grader_host}/run/grade/",
-      'OMEGAUP_GRADER_BROADCAST_URL'     => "${grader_host}/broadcast/",
-      'OMEGAUP_GRADER_RELOAD_CONFIG_URL' => "${grader_host}/reload-config/",
-      'OMEGAUP_GRADER_STATUS_URL'        => "${grader_host}/grader/status/",
+      'OMEGAUP_GRADER_URL'               => "${grader_host}",
       'OMEGAUP_GITSERVER_SECRET_TOKEN'   => $gitserver_shared_token ? {
         undef                            => '',
         default                          => $gitserver_shared_token,
