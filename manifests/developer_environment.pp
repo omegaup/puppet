@@ -13,10 +13,12 @@ class omegaup::developer_environment (
               'ca-certificates', 'meld', 'vim-gtk', 'yarn', 'nodejs']:
     ensure  => present,
   }
-  php::extension { 'PHP_CodeSniffer':
-    ensure   => '2.9.1',
-    sapi     => 'none',
-    provider => 'pear',
+  remote_file { '/usr/bin/phpcbf':
+    url      => 'https://github.com/squizlabs/PHP_CodeSniffer/releases/download/3.4.0/phpcbf.phar',
+    sha1hash => 'f8030b99bb21805b573c9a76d1affe8d00f28586',
+    mode     => '755',
+    owner    => 'root',
+    group    => 'root',
   }
   Anchor['php::begin'] -> class { '::php::phpunit':
     source      => 'https://phar.phpunit.de/phpunit-5.3.4.phar',
