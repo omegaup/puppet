@@ -9,9 +9,12 @@ class omegaup::developer_environment (
   # Packages
   package { [ 'vim', 'openssh-client', 'gcc', 'g++',
               'clang-format-3.7', 'python-pip', 'python3-six', 'python-six',
-              'python3-pep8', 'pylint3', 'silversearcher-ag', 'libgconf-2-4',
+              'silversearcher-ag', 'libgconf-2-4',
               'ca-certificates', 'meld', 'vim-gtk', 'yarn', 'nodejs']:
     ensure  => present,
+  }
+  package { ['python3-pep8', 'pylint3']:
+    ensure => absent,
   }
   remote_file { '/usr/bin/phpcbf':
     url      => 'https://github.com/squizlabs/PHP_CodeSniffer/releases/download/3.4.0/phpcbf.phar',
@@ -25,9 +28,30 @@ class omegaup::developer_environment (
     auto_update => false,
     path        => '/usr/bin/phpunit',
   } -> Anchor['php::end']
-  package { 'https://github.com/google/closure-linter/zipball/master':
-    ensure   => present,
-    provider => 'pip',
+  exec { 'closure-linter':
+    command => '/usr/bin/pip install https://github.com/google/closure-linter/zipball/master',
+    creates => '/usr/local/bin/fixjsstyle',
+  }
+  exec { 'pylint':
+    command  => '/usr/bin/pip3 install pylint==2.2.2',
+    require  => Package['python3-pip'],
+    unless   => [
+      '/bin/bash -c \'/usr/bin/python3 -m pip list 2>/dev/null | grep -E "^pylint\s+\(?2.2.2\)?\$" > /dev/null\'',
+    ],
+  }
+  exec { 'pycodestyle':
+    command  => '/usr/bin/pip3 install pycodestyle==2.5.0',
+    require  => Package['python3-pip'],
+    unless   => [
+      '/bin/bash -c \'/usr/bin/python3 -m pip list 2>/dev/null | grep -E "^pycodestyle\s+\(?2.5.0\)?\$" > /dev/null\'',
+    ],
+  }
+  exec { 'yapf':
+    command  => '/usr/bin/pip3 install yapf==0.25.0',
+    require  => Package['python3-pip'],
+    unless   => [
+      '/bin/bash -c \'/usr/bin/python3 -m pip list 2>/dev/null | grep -E "^yapf\s+\(?0.25.0\)?\$" > /dev/null\'',
+    ],
   }
 
   # Test setup
