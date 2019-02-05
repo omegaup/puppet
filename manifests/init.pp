@@ -38,9 +38,14 @@ class omegaup (
   # Common
   exec { 'submissions-directory':
     creates => '/var/lib/omegaup/submissions',
-    command => '/usr/bin/mkhexdirs /var/lib/omegaup/submissions www-data www-data',
+    command => '/usr/bin/mkhexdirs /var/lib/omegaup/submissions www-data omegaup 775',
     require => [File['/var/lib/omegaup'], File['/usr/bin/mkhexdirs'],
                 User['www-data']],
+  }
+  exec { 'submissions-directory-amend':
+    command => '/bin/chown www-data:omegaup /var/lib/omegaup/submissions/* && /bin/chmod 775 /var/lib/omegaup/submissions/*',
+    unless => '/usr/bin/test "$(/usr/bin/stat -c "%U:%G %a" /var/lib/omegaup/submissions/00)" = "www-data:omegaup 775"',
+    require => [Exec['submissions-directory'], User['omegaup']],
   }
   exec { 'systemctl daemon-reload':
     command     => '/bin/systemctl daemon-reload',
