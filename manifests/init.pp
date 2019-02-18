@@ -43,8 +43,8 @@ class omegaup (
                 User['www-data']],
   }
   exec { 'submissions-directory-amend':
-    command => '/bin/chown www-data:omegaup /var/lib/omegaup/submissions/* && /bin/chmod 775 /var/lib/omegaup/submissions/*',
-    unless => '/usr/bin/test "$(/usr/bin/stat -c "%U:%G %a" /var/lib/omegaup/submissions/00)" = "www-data:omegaup 775"',
+    command => '/bin/chown omegaup:omegaup /var/lib/omegaup/submissions/* && /bin/chmod 755 /var/lib/omegaup/submissions/*',
+    unless => '/usr/bin/test "$(/usr/bin/stat -c "%U:%G %a" /var/lib/omegaup/submissions/00)" = "omegaup:omegaup 755"',
     require => [Exec['submissions-directory'], User['omegaup']],
   }
   exec { 'systemctl daemon-reload':
@@ -78,9 +78,16 @@ class omegaup (
   # Web application
   file { '/var/lib/omegaup/problems.git':
     ensure  => 'directory',
-    owner   => 'www-data',
-    group   => 'www-data',
+    owner   => 'omegaup',
+    group   => 'omegaup',
     require => File['/var/lib/omegaup'],
+  }
+  exec { 'problems.git-directory-amend':
+    command => '/bin/chown -R omegaup:omegaup /var/lib/omegaup/problems.git && /bin/chmod -R 755 /var/lib/omegaup/problems.git',
+    unless => [
+      '/usr/bin/test "$(list=(/var/lib/omegaup/problems.git/*/); /usr/bin/stat -c "%U:%G %a" "${list[0]}" 2>/dev/null || echo "omegaup:omegaup 755")" = "omegaup:omegaup 755"',
+    ],
+    require => [File['/var/lib/omegaup/problems.git'], User['omegaup']],
   }
   file { '/var/log/omegaup/omegaup.log':
     ensure  => 'file',

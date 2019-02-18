@@ -116,8 +116,8 @@ class omegaup::services::grader (
   # Git service
   file { '/var/log/omegaup/gitserver.log':
     ensure  => 'file',
-    owner   => 'www-data',
-    group   => 'www-data',
+    owner   => 'omegaup',
+    group   => 'omegaup',
     require => File['/var/log/omegaup'],
   }
   file { '/etc/systemd/system/omegaup-gitserver.service':
