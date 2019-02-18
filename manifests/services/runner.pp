@@ -8,6 +8,34 @@ class omegaup::services::runner (
 ) {
   include omegaup::users
 
+  remote_file { '/var/lib/omegaup/omegaup-runner.tar.xz':
+    url      => 'https://github.com/omegaup/quark/releases/download/v1.1.7/omegaup-runner.tar.xz',
+    sha1hash => '58ce49e65cc2b77501f748aad151b366736d7f40',
+    mode     => '644',
+    owner    => 'root',
+    group    => 'root',
+    notify   => Exec['unlink omegaup-runner'],
+    require  => File['/var/lib/omegaup'],
+  }
+
+  exec { 'unlink omegaup-runner':
+    command     => '/bin/rm -f /usr/bin/omegaup-runner',
+    user        => 'root',
+    notify      => Exec['omegaup-runner'],
+    refreshonly => true,
+  }
+
+  exec { 'omegaup-runner':
+    command     => '/bin/tar -xf /var/lib/omegaup/omegaup-runner.tar.xz -C /',
+    user        => 'root',
+    notify      => File['/usr/bin/omegaup-runner'],
+    refreshonly => true,
+  }
+
+  file { '/usr/bin/omegaup-runner':
+    require => Exec['omegaup-runner'],
+  }
+
   remote_file { '/var/lib/omegaup/omegajail-xenial-distrib-x86_64.tar.bz2':
     url      => 'https://omegaup-omegajail.s3.amazonaws.com/omegajail-xenial-distrib-x86_64.tar.bz2',
     sha1hash => '35c7c21fc58e904ca8a62882654bfefe1b6e9aba',
@@ -82,7 +110,7 @@ class omegaup::services::runner (
         '/usr/bin/omegaup-runner',
         '/etc/omegaup/runner/config.json'
       ],
-      Exec['omegaup-backend'],
+      Exec['omegaup-runner'],
     ],
     require   => [
       File[

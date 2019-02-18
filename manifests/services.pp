@@ -1,8 +1,8 @@
 # The omegaUp services.
 class omegaup::services {
   remote_file { '/var/lib/omegaup/omegaup-backend.tar.xz':
-    url      => 'https://github.com/omegaup/quark/releases/download/v1.1.6/omegaup-backend.tar.xz',
-    sha1hash => 'c4b10bff84a93d4e0f2f887a7490103d3aab3cd4',
+    url      => 'https://github.com/omegaup/quark/releases/download/v1.1.7/omegaup-backend.tar.xz',
+    sha1hash => 'fcf7280cb6d24045e0658cc0f4ffd9a3b8e04f04',
     mode     => '644',
     owner    => 'root',
     group    => 'root',
@@ -11,7 +11,7 @@ class omegaup::services {
   }
 
   exec { 'unlink omegaup-backend':
-    command     => '/bin/rm -f /usr/bin/omegaup-grader /usr/bin/omegaup-runner /usr/bin/omegaup-broadcaster',
+    command     => '/bin/rm -f /usr/bin/omegaup-grader /usr/bin/omegaup-broadcaster',
     user        => 'root',
     notify      => Exec['omegaup-backend'],
     refreshonly => true,
@@ -22,28 +22,33 @@ class omegaup::services {
     user        => 'root',
     notify      => File[
       '/usr/bin/omegaup-grader',
-      '/usr/bin/omegaup-runner',
       '/usr/bin/omegaup-broadcaster'
     ],
     refreshonly => true,
   }
 
-  file { ['/usr/bin/omegaup-grader', '/usr/bin/omegaup-runner',
-          '/usr/bin/omegaup-broadcaster']:
+  file { ['/usr/bin/omegaup-grader', '/usr/bin/omegaup-broadcaster']:
     require => Exec['omegaup-backend'],
   }
 
-  remote_file { '/usr/bin/omegaup-gitserver.xz':
-    url      => 'https://github.com/omegaup/gitserver/releases/download/v1.3.4/omegaup-gitserver.xz',
-    sha1hash => 'bb044a56bdeab728503689eed78181984173d1c1',
+  remote_file { '/var/lib/omegaup/omegaup-gitserver.tar.xz':
+    url      => 'https://github.com/omegaup/gitserver/releases/download/v1.3.5/omegaup-gitserver.tar.xz',
+    sha1hash => 'a7e96ddc14dc9189e0f54f69dfc06c096528e922',
     mode     => '644',
     owner    => 'root',
     group    => 'root',
     notify   => Exec['omegaup-gitserver'],
   }
 
+  exec { 'unlink omegaup-gitserver':
+    command     => '/bin/rm -f /usr/bin/omegaup-gitserver',
+    user        => 'root',
+    notify      => Exec['omegaup-gitserver'],
+    refreshonly => true,
+  }
+
   exec { 'omegaup-gitserver':
-    command     => '/usr/bin/unxz --force --keep /usr/bin/omegaup-gitserver.xz && chmod 755 /usr/bin/omegaup-gitserver',
+    command     => '/bin/tar -xf /var/lib/omegaup/omegaup-gitserver.tar.xz -C /',
     user        => 'root',
     notify      => File['/usr/bin/omegaup-gitserver'],
     refreshonly => true,
