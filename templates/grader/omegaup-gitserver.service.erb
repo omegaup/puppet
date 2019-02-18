@@ -3,7 +3,7 @@ Description=omegaUp git service
 After=network.target
 
 [Service]
-Type=simple
+Type=notify
 User=omegaup
 Group=omegaup
 ExecStart=/usr/bin/omegaup-gitserver -allow-direct-push-to-master -root=/var/lib/omegaup/problems.git -log-file=/var/log/omegaup/gitserver.log<% if @gitserver_shared_token %> -public-key "" -secret-token <%= @gitserver_shared_token %><% end %>
