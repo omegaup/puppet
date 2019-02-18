@@ -83,10 +83,8 @@ class omegaup (
     require => File['/var/lib/omegaup'],
   }
   exec { 'problems.git-directory-amend':
-    command => '/bin/chown -R omegaup:omegaup /var/lib/omegaup/problems.git && /bin/chmod -R 755 /var/lib/omegaup/problems.git',
-    unless => [
-      '/usr/bin/test "$(list=(/var/lib/omegaup/problems.git/*/); /usr/bin/stat -c "%U:%G %a" "${list[0]}" 2>/dev/null || echo "omegaup:omegaup 755")" = "omegaup:omegaup 755"',
-    ],
+    command => '/bin/chown omegaup:omegaup /var/lib/omegaup/problems.git/* && /bin/chmod 755 /var/lib/omegaup/problems.git/*',
+    unless => '/usr/bin/test "$(for problem in /var/lib/omegaup/problems.git/*/; do /usr/bin/stat -c "%U:%G %a" "${problem}"; break; done)" = "omegaup:omegaup 755"',
     require => [File['/var/lib/omegaup/problems.git'], User['omegaup']],
   }
   file { '/var/log/omegaup/omegaup.log':
