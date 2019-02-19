@@ -1,8 +1,8 @@
 # The omegaUp services.
 class omegaup::services {
   remote_file { '/var/lib/omegaup/omegaup-backend.tar.xz':
-    url      => 'https://github.com/omegaup/quark/releases/download/v1.1.7/omegaup-backend.tar.xz',
-    sha1hash => 'fcf7280cb6d24045e0658cc0f4ffd9a3b8e04f04',
+    url      => 'https://github.com/omegaup/quark/releases/download/v1.1.8/omegaup-backend.tar.xz',
+    sha1hash => '4c7a235be73622390b8993d5f51ac076718d7839',
     mode     => '644',
     owner    => 'root',
     group    => 'root',
