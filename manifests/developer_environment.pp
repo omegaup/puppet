@@ -7,37 +7,26 @@ class omegaup::developer_environment (
   $mysql_password,
 ) {
   # Packages
-  package { [ 'vim', 'openssh-client', 'gcc', 'g++',
-              'clang-format-3.7', 'python-pip', 'python3-six', 'python-six',
-              'silversearcher-ag', 'libgconf-2-4',
-              'ca-certificates', 'meld', 'vim-gtk', 'yarn', 'nodejs']:
+  package { [ 'vim', 'openssh-client', 'gcc', 'g++', 'python-pip',
+              'python3-six', 'python-six', 'silversearcher-ag', 'libgconf-2-4',
+              'ca-certificates', 'meld', 'vim-gtk', 'yarn', 'nodejs',
+              'docker.io']:
     ensure  => present,
   }
   package { ['python3-pep8', 'pylint3']:
     ensure => absent,
   }
-  remote_file { '/usr/bin/phpcbf':
-    url      => 'https://github.com/squizlabs/PHP_CodeSniffer/releases/download/3.4.0/phpcbf.phar',
-    sha1hash => 'f8030b99bb21805b573c9a76d1affe8d00f28586',
-    mode     => '755',
-    owner    => 'root',
-    group    => 'root',
-  }
-  Anchor['php::begin'] -> class { '::php::phpunit':
-    source      => 'https://phar.phpunit.de/phpunit-5.3.4.phar',
+  Anchor['php::begin'] -> exec { 'delete-older-phpunit':
+    command => '/bin/rm -f /usr/bin/phpunit',
+    unless  => '/usr/bin/test -f /usr/bin/phpunit && /usr/bin/phpunit --atleast-version 6.5.9',
+  } -> class { '::php::phpunit':
+    source      => 'https://phar.phpunit.de/phpunit-6.5.9.phar',
     auto_update => false,
     path        => '/usr/bin/phpunit',
   } -> Anchor['php::end']
   exec { 'closure-linter':
     command => '/usr/bin/pip install https://github.com/google/closure-linter/zipball/master',
     creates => '/usr/local/bin/fixjsstyle',
-  }
-  exec { 'pylint':
-    command  => '/usr/bin/pip3 install pylint==2.2.2',
-    require  => Package['python3-pip'],
-    unless   => [
-      '/bin/bash -c \'/usr/bin/python3 -m pip list 2>/dev/null | grep -E "^pylint\s+\(?2.2.2\)?\$" > /dev/null\'',
-    ],
   }
   exec { 'pycodestyle':
     command  => '/usr/bin/pip3 install pycodestyle==2.5.0',
@@ -52,6 +41,11 @@ class omegaup::developer_environment (
     unless   => [
       '/bin/bash -c \'/usr/bin/python3 -m pip list 2>/dev/null | grep -E "^yapf\s+\(?0.25.0\)?\$" > /dev/null\'',
     ],
+  }
+  exec { 'vagrant-docker-permissions':
+    command => '/usr/sbin/usermod -aG docker vagrant',
+    unless  => '/usr/bin/test -n "$(/usr/bin/groups vagrant | grep docker)"',
+    require => Package['docker.io'],
   }
 
   # Test setup
@@ -88,6 +82,15 @@ class omegaup::developer_environment (
     owner  => $user,
     group  => $user,
   }
+  file { '/tmp/omegaup':
+    ensure => 'directory',
+    owner  => $user,
+    group  => $user,
+  } -> file { '/tmp/omegaup/problems.git':
+    ensure => 'directory',
+    owner  => $user,
+    group  => $user,
+  }
 
   # Selenium
   remote_file { '/var/lib/omegaup/chromedriver_linux64.zip':
@@ -114,7 +117,10 @@ class omegaup::developer_environment (
   }
   exec { 'selenium':
     command  => '/usr/bin/pip3 install selenium',
-    creates  => '/usr/local/lib/python3.5/dist-packages/selenium',
+    creates  => $::lsbdistcodename ? {
+      'bionic' => '/usr/local/lib/python3.6/dist-packages/selenium',
+      default  => '/usr/local/lib/python3.5/dist-packages/selenium',
+    }
   }
   remote_file { '/var/lib/omegaup/geckodriver_linux64.tar.gz':
     url      => 'https://github.com/mozilla/geckodriver/releases/download/v0.19.1/geckodriver-v0.19.1-linux64.tar.gz',

@@ -42,6 +42,17 @@ class omegaup::web(
   } else {
     $php_development_settings = {}
   }
+  if $::lsbdistcodename == 'bionic' {
+    class { '::php::globals':
+      php_version => '7.2',
+      config_root => '/etc/php/7.2',
+    }
+  } else {
+    class { '::php::globals':
+      php_version => '7.0',
+      config_root => '/etc/php/7.0',
+    }
+  }
   class { '::php':
     ensure       => latest,
     manage_repos => false,
@@ -73,9 +84,6 @@ class omegaup::web(
       mbstring     => {
         provider   => 'apt',
       },
-      mcrypt       => {
-        provider   => 'apt',
-      },
       mysql        => {
         provider   => 'apt',
         so_name    => 'mysqli',
@@ -84,6 +92,7 @@ class omegaup::web(
         provider   => 'apt',
       },
     },
+    require => Class['::php::globals'],
   }
 }
 

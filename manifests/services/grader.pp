@@ -61,9 +61,6 @@ class omegaup::services::grader (
   }
 
   # Runtime files
-  package { ['libhttp-parser2.1', 'libssh2-1']:
-    ensure => installed,
-  }
   file { ['/var/log/omegaup/service.log', '/var/log/omegaup/tracing.json']:
     ensure  => 'file',
     owner   => 'omegaup',
@@ -109,7 +106,6 @@ class omegaup::services::grader (
       ],
       Remote_File['/usr/share/java/libinteractive.jar'],
       Omegaup::Certmanager::Cert['/etc/omegaup/grader/key.pem'],
-      Package['libhttp-parser2.1', 'libssh2-1'],
     ],
   }
 
