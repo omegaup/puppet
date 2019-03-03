@@ -33,13 +33,18 @@ class omegaup::web(
   }
 
   # PHP
-  $php_development_settings = $development_environment ? {
-    true => {
+  if $development_environment {
+    $php_development_settings = {
       'PHP/error_reporting' => 'E_ALL',
       'PHP/display_errors'  => 'On',
       'PHP/display_startup_errors'  => 'On',
-    },
-    false => {},
+    }
+  } else {
+    $php_development_settings = {}
+  }
+  $php_version = $::lsbdistcodename ? {
+    'bionic' => '7.2',
+    default  => '7.0',
   }
   class { '::php':
     ensure       => latest,
