@@ -3,6 +3,10 @@ class omegaup::web(
   $default_server = true,
   $hostname = 'localhost',
   $include_files = [],
+  $php_version = $::lsbdistcodename ? {
+    'bionic' => '7.2',
+    default  => '7.0',
+  },
   $php_max_children = 36,
   $php_max_requests = 500,
   $try_files = undef,
@@ -41,10 +45,6 @@ class omegaup::web(
     }
   } else {
     $php_development_settings = {}
-  }
-  $php_version = $::lsbdistcodename ? {
-    'bionic' => '7.2',
-    default  => '7.0',
   }
   class { '::php':
     ensure       => latest,

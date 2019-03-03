@@ -42,7 +42,7 @@ file { '/etc/omegaup/grader':
   require => File['/etc/omegaup'],
 } -> omegaup::certmanager::cert { '/etc/omegaup/grader/key.pem':
   hostname      => $hostname,
-  password      => $keystore_password,
+  password      => 'omegaup',
   owner         => 'omegaup',
   mode          => '600',
   separate_cert => '/etc/omegaup/grader/certificate.pem',
@@ -62,7 +62,7 @@ file { '/etc/omegaup/broadcaster':
   require => File['/etc/omegaup'],
 } -> omegaup::certmanager::cert { '/etc/omegaup/broadcaster/key.pem':
   hostname      => $hostname,
-  password      => $keystore_password,
+  password      => 'omegaup',
   owner         => 'omegaup',
   mode          => '600',
   separate_cert => '/etc/omegaup/broadcaster/certificate.pem',

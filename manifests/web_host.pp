@@ -100,7 +100,7 @@ define omegaup::web_host(
       ssl                  => $ssl,
       ssl_only             => $ssl,
       location             => '~ \.php$',
-      fastcgi              => 'unix:/run/php/php7.0-fpm.sock',
+      fastcgi              => "unix:/run/php/php${::omegaup::web::php_version}-fpm.sock",
       proxy                => undef,
       fastcgi_script       => undef,
       location_cfg_prepend => {
