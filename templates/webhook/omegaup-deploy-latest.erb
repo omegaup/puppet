@@ -1,11 +1,13 @@
 #!/bin/bash
 
+MODULEPATH="$(/usr/bin/puppet config print modulepath | sed -e 's/:.*//')/omegaup"
+
 # Update the Puppet files
-(cd /etc/puppet/modules/omegaup && git pull --rebase origin master)
+(cd "${MODULEPATH}" && git pull --rebase origin master)
 
 # Apply the latest changes.
 puppet apply --detailed-exitcodes \
-  /etc/puppet/modules/omegaup/manifests/<%= @manifest_name %>.pp
+  "${MODULEPATH}/manifests/<%= @manifest_name %>.pp"
 
 exitcode=$?
 # From https://puppet.com/docs/puppet/5.3/man/apply.html:

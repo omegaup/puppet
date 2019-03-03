@@ -54,7 +54,7 @@ github { '/opt/omegaup-staging':
 file { '/usr/local/bin/omegaup-uprev':
   ensure  => 'file',
   source  => 'puppet:///modules/omegaup/omegaup-uprev',
-  mode    => 0755,
+  mode    => '755',
   owner   => 'root',
   group   => 'root',
 }
