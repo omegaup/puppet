@@ -7,6 +7,7 @@ class omegaup::services::broadcaster (
   $keystore_password = 'omegaup',
 ) {
   include omegaup::users
+  include omegaup::directories
 
   # Configuration
   file { '/etc/omegaup/broadcaster/config.json':

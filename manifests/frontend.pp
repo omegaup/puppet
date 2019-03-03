@@ -1,22 +1,19 @@
 hiera_include('classes')
 
-file { '/etc/omegaup': ensure => 'directory' }
-
 host { 'localhost':
   ensure => present,
   name   => hiera('omegaup_hostname'),
   ip     => '127.0.0.1',
 }
 
-omegaup::certmanager::cert { '/etc/omegaup/frontend/certificate.pem':
-  owner    => 'www-data',
-  mode     => '600',
-  require  => [File['/etc/omegaup/frontend'], User['www-data']],
-  hostname => hiera('omegaup_hostname'),
-}
 file { '/etc/omegaup/frontend':
   ensure  => 'directory',
   require => File['/etc/omegaup'],
+} -> omegaup::certmanager::cert { '/etc/omegaup/frontend/certificate.pem':
+  owner    => 'www-data',
+  mode     => '600',
+  require  => User['www-data'],
+  hostname => hiera('omegaup_hostname'),
 }
 class { '::omegaup::apt_sources':
   use_newrelic            => true,

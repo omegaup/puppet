@@ -20,21 +20,21 @@ define omegaup::certmanager::cert (
   exec { "certmanager-${title}":
     command => $command,
     creates => $creates,
-    require => [Exec['certmanager-ca']],
+    require => Exec['certmanager-ca'],
   }
 
   file { $title:
     owner   => $owner,
     group   => $group,
     mode    => $mode,
-    require => [Exec["certmanager-${title}"]],
+    require => Exec["certmanager-${title}"],
   }
 
   if $separate_cert != undef {
     file { $separate_cert:
       owner   => $owner,
       group   => $group,
-      require => [Exec["certmanager-${title}"]],
+      require => Exec["certmanager-${title}"],
     }
   }
 }

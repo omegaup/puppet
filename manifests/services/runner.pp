@@ -7,6 +7,7 @@ class omegaup::services::runner (
   $runner_flags = '',
 ) {
   include omegaup::users
+  include omegaup::directories
 
   remote_file { '/var/lib/omegaup/omegaup-runner.tar.xz':
     url      => 'https://github.com/omegaup/quark/releases/download/v1.1.7/omegaup-runner.tar.xz',
@@ -59,22 +60,19 @@ class omegaup::services::runner (
   file { '/etc/omegaup/runner':
     ensure  => 'directory',
     require => File['/etc/omegaup'],
-  }
-  file { '/etc/omegaup/runner/config.json':
-    ensure  => 'file',
-    owner   => 'omegaup',
-    group   => 'omegaup',
-    mode    => '644',
-    content => template('omegaup/runner/config.json.erb'),
-    require => File['/etc/omegaup/runner'],
-  }
-  omegaup::certmanager::cert { '/etc/omegaup/runner/key.pem':
+  } -> omegaup::certmanager::cert { '/etc/omegaup/runner/key.pem':
     hostname      => $hostname,
     password      => $keystore_password,
     owner         => 'omegaup',
     mode          => '600',
     separate_cert => '/etc/omegaup/runner/certificate.pem',
-    require       => [File['/etc/omegaup/runner'], User['omegaup']],
+    require       => User['omegaup'],
+  } -> file { '/etc/omegaup/runner/config.json':
+    ensure  => 'file',
+    owner   => 'omegaup',
+    group   => 'omegaup',
+    mode    => '644',
+    content => template('omegaup/runner/config.json.erb'),
   }
 
   # Runtime files

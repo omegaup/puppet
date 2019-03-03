@@ -1,6 +1,10 @@
 # Creates directories needed at runtime.
 class omegaup::directories {
-  file { ['/var/lib/omegaup', '/var/log/omegaup']: ensure => 'directory' }
+  file { ['/var/lib/omegaup', '/var/log/omegaup', '/etc/omegaup']:
+    ensure => 'directory',
+  } -> file { ['/etc/omegaup/grader', '/etc/omegaup/broadcaster']:
+    ensure => 'directory',
+  }
 }
 
 # vim:expandtab ts=2 sw=2

@@ -1,15 +1,5 @@
 hiera_include('classes')
 
-file { '/etc/omegaup': ensure => 'directory' }
-file { '/etc/omegaup/broadcaster':
-  ensure  => 'directory',
-  require => File['/etc/omegaup'],
-}
-file { '/etc/omegaup/grader':
-  ensure  => 'directory',
-  require => File['/etc/omegaup'],
-}
-
 host { 'localhost':
   ensure => present,
   name   => hiera('omegaup_hostname'),

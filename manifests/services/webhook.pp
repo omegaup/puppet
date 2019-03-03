@@ -28,15 +28,13 @@ class omegaup::services::webhook (
   # Configuration
   file { '/etc/omegaup/webhook':
     ensure  => 'directory',
-    require => File['/etc/omegaup'],
-  }
-  file { '/etc/omegaup/webhook/config.json':
+	} -> file { '/etc/omegaup/webhook/config.json':
     ensure  => 'file',
     owner   => 'omegaup-deploy',
     group   => 'omegaup-deploy',
     mode    => '640',
     content => template('omegaup/webhook/config.json.erb'),
-    require => [User['omegaup-deploy'], File['/etc/omegaup/webhook']],
+    require => User['omegaup-deploy'],
   }
   file { '/etc/sudoers.d/omegaup-deploy':
     ensure  => 'file',

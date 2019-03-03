@@ -8,9 +8,6 @@ exec { 'systemctl daemon-reload':
   command     => '/bin/systemctl daemon-reload',
   refreshonly => true,
 }
-file { ['/etc/omegaup', '/var/lib/omegaup']:
-  ensure => directory,
-}
 
 class { '::omegaup::apt_sources':
   use_newrelic            => true,
