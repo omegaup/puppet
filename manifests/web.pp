@@ -33,25 +33,13 @@ class omegaup::web(
   }
 
   # PHP
-  if $development_environment {
-    $php_development_settings = {
+  $php_development_settings = $development_environment ? {
+    true => {
       'PHP/error_reporting' => 'E_ALL',
       'PHP/display_errors'  => 'On',
       'PHP/display_startup_errors'  => 'On',
-    }
-  } else {
-    $php_development_settings = {}
-  }
-  if $::lsbdistcodename == 'bionic' {
-    class { '::php::globals':
-      php_version => '7.2',
-      config_root => '/etc/php/7.2',
-    }
-  } else {
-    class { '::php::globals':
-      php_version => '7.0',
-      config_root => '/etc/php/7.0',
-    }
+    },
+    false => {},
   }
   class { '::php':
     ensure       => latest,
@@ -63,7 +51,7 @@ class omegaup::web(
     }, $php_development_settings),
     fpm_pools     => {
       'www'       => {
-        'listen'          => '/run/php/php7.0-fpm.sock',
+        'listen'          => "/run/php/php${php_version}-fpm.sock",
         'listen_owner'    => 'www-data',
         'listen_group'    => 'www-data',
         'pm_max_children' => $php_max_children,
@@ -92,7 +80,6 @@ class omegaup::web(
         provider   => 'apt',
       },
     },
-    require => Class['::php::globals'],
   }
 }
 

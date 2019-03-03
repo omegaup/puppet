@@ -17,8 +17,8 @@ class { '::omegaup::apt_sources':
   use_elastic_beats       => true,
   development_environment => false,
 }
-class { '::omegaup::users':
-}
+class { '::omegaup::web_app': }
+class { '::omegaup::users': }
 class { '::omegaup::blog':
   require => Class['::omegaup::web'],
 }

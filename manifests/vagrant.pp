@@ -29,13 +29,25 @@ class { '::omegaup':
   gitserver_shared_token  => 'gitserversharedtoken',
   require                 => [Class['::omegaup::database']],
 }
+class { '::omegaup::web_app': }
 
 class { '::omegaup::cron':
   mysql_password => 'omegaup',
   require        => Class['::omegaup'],
 }
 class { '::omegaup::services': }
-class { '::omegaup::services::grader':
+
+file { '/etc/omegaup/grader':
+  ensure  => 'directory',
+  require => File['/etc/omegaup'],
+} -> omegaup::certmanager::cert { '/etc/omegaup/grader/key.pem':
+  hostname      => $hostname,
+  password      => $keystore_password,
+  owner         => 'omegaup',
+  mode          => '600',
+  separate_cert => '/etc/omegaup/grader/certificate.pem',
+  require       => User['omegaup'],
+} -> class { '::omegaup::services::grader':
   keystore_password => 'omegaup',
   mysql_password    => 'omegaup',
   user              => 'vagrant',
@@ -45,7 +57,17 @@ class { '::omegaup::services::runner':
   keystore_password => 'omegaup',
   require           => Class['::omegaup::services'],
 }
-class { '::omegaup::services::broadcaster':
+file { '/etc/omegaup/broadcaster':
+  ensure  => 'directory',
+  require => File['/etc/omegaup'],
+} -> omegaup::certmanager::cert { '/etc/omegaup/broadcaster/key.pem':
+  hostname      => $hostname,
+  password      => $keystore_password,
+  owner         => 'omegaup',
+  mode          => '600',
+  separate_cert => '/etc/omegaup/broadcaster/certificate.pem',
+  require       => User['omegaup'],
+} -> class { '::omegaup::services::broadcaster':
   keystore_password => 'omegaup',
   require           => Class['::omegaup::services'],
 }

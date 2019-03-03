@@ -23,6 +23,7 @@ class { '::omegaup::apt_sources':
   use_elastic_beats       => true,
   development_environment => false,
 }
+class { '::omegaup::web_app': }
 
 # Staging repository
 file { '/opt/nvm':

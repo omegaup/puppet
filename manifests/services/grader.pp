@@ -29,20 +29,10 @@ class omegaup::services::grader (
     mode     => '644',
     owner    => 'root',
     group    => 'root',
-    notify   => Exec['refresh-libinteractive'],
     require  => Package['openjdk-8-jre-headless'],
-  }
-  exec { 'refresh-libinteractive':
-    command     => "${root}/stuff/refresh_libinteractive.py",
-    require     => [Github[$root]],
-    refreshonly => true,
   }
 
   # Configuration
-  file { '/etc/omegaup/grader':
-    ensure  => 'directory',
-    require => File['/etc/omegaup'],
-  }
   file { '/etc/omegaup/grader/config.json':
     ensure  => 'file',
     owner   => 'omegaup',
@@ -50,14 +40,6 @@ class omegaup::services::grader (
     mode    => '600',
     content => template('omegaup/grader/config.json.erb'),
     require => File['/etc/omegaup/grader'],
-  }
-  omegaup::certmanager::cert { '/etc/omegaup/grader/key.pem':
-    hostname      => $hostname,
-    password      => $keystore_password,
-    owner         => 'omegaup',
-    mode          => '600',
-    separate_cert => '/etc/omegaup/grader/certificate.pem',
-    require       => [File['/etc/omegaup/grader'], User['omegaup']],
   }
 
   # Runtime files
@@ -73,6 +55,31 @@ class omegaup::services::grader (
     owner   => 'omegaup',
     group   => 'omegaup',
     require => File['/var/lib/omegaup'],
+  }
+  exec { 'submissions-directory':
+    creates => '/var/lib/omegaup/submissions',
+    command => '/usr/bin/mkhexdirs /var/lib/omegaup/submissions www-data omegaup 775',
+    require => [File['/var/lib/omegaup'], File['/usr/bin/mkhexdirs'],
+                User['www-data']],
+  }
+  exec { 'submissions-directory-amend':
+    command => '/bin/chown omegaup:omegaup /var/lib/omegaup/submissions/* && /bin/chmod 755 /var/lib/omegaup/submissions/*',
+    unless => '/usr/bin/test "$(/usr/bin/stat -c "%U:%G %a" /var/lib/omegaup/submissions/00)" = "omegaup:omegaup 755"',
+    require => [Exec['submissions-directory'], User['omegaup']],
+  }
+  file { '/var/lib/omegaup/problems.git':
+    ensure  => 'directory',
+    owner   => 'omegaup',
+    group   => 'omegaup',
+    require => File['/var/lib/omegaup'],
+  }
+  exec { 'problems.git-directory-amend':
+    command => '/bin/chown omegaup:omegaup /var/lib/omegaup/problems.git/* && /bin/chmod 755 /var/lib/omegaup/problems.git/*',
+    unless => [
+      '/usr/bin/test -z "$(/bin/ls -A /var/lib/omegaup/problems.git/)"',
+      '/usr/bin/test "$(for problem in /var/lib/omegaup/problems.git/*/; do /usr/bin/stat -c "%U:%G %a" "${problem}"; break; done)" = "omegaup:omegaup 755"',
+    ],
+    require => [File['/var/lib/omegaup/problems.git'], User['omegaup']],
   }
 
   # Service
@@ -105,7 +112,6 @@ class omegaup::services::grader (
         '/etc/omegaup/grader/config.json'
       ],
       Remote_File['/usr/share/java/libinteractive.jar'],
-      Omegaup::Certmanager::Cert['/etc/omegaup/grader/key.pem'],
     ],
   }
 

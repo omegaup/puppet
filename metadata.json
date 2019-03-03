@@ -9,7 +9,6 @@
   "issues_url": "https://github.com/omegaup/puppet/issues",
   "dependencies": [
     {"name":"puppet/nginx","version_requirement":"< 0.7.0"},
-    {"name":"puppet/php","version_requirement":"< 5.0.0"},
     {"name":"puppetlabs/apt","version_requirement":"< 3.0.0"},
     {"name":"puppetlabs/mysql","version_requirement":"< 4.0.0"},
     {"name":"puppetlabs/stdlib","version_requirement":">= 1.0.0"},

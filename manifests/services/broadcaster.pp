@@ -9,10 +9,6 @@ class omegaup::services::broadcaster (
   include omegaup::users
 
   # Configuration
-  file { '/etc/omegaup/broadcaster':
-    ensure  => 'directory',
-    require => File['/etc/omegaup'],
-  }
   file { '/etc/omegaup/broadcaster/config.json':
     ensure  => 'file',
     owner   => 'omegaup',
@@ -20,14 +16,6 @@ class omegaup::services::broadcaster (
     mode    => '600',
     content => template('omegaup/broadcaster/config.json.erb'),
     require => File['/etc/omegaup/broadcaster'],
-  }
-  omegaup::certmanager::cert { '/etc/omegaup/broadcaster/key.pem':
-    hostname      => $hostname,
-    password      => $keystore_password,
-    owner         => 'omegaup',
-    mode          => '600',
-    separate_cert => '/etc/omegaup/broadcaster/certificate.pem',
-    require       => [File['/etc/omegaup/broadcaster'], User['omegaup']],
   }
 
   # Runtime files
@@ -67,7 +55,6 @@ class omegaup::services::broadcaster (
         '/var/log/omegaup/broadcaster.tracing.json',
         '/etc/omegaup/broadcaster/config.json'
       ],
-      Omegaup::Certmanager::Cert['/etc/omegaup/broadcaster/key.pem'],
     ],
   }
 }
