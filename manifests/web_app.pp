@@ -1,6 +1,9 @@
 class omegaup::web_app(
   $additional_php_config_settings = $::omegaup::additional_php_config_settings,
   $development_environment = $::omegaup::development_environment,
+  $frontend_proxy_websockets_v1_url = 'http://localhost:39613',
+  $frontend_proxy_websockets_url = 'http://localhost:22291',
+  $frontend_proxy_grader_url = 'http://localhost:36663',
   $github_ensure = $::omegaup::github_ensure,
   $github_branch = $::omegaup::github_branch,
   $github_repo = $::omegaup::github_repo,
@@ -101,15 +104,22 @@ class omegaup::web_app(
     creates  => '/usr/local/bin/aws',
     require  => Package['python3-pip'],
   }
+  file { '/etc/nginx/sites-available/omegaup.com-nginx_rewrites.conf':
+    content => template('omegaup/web_app/nginx.rewrites.erb'),
+    mode    => '644',
+    owner   => 'root',
+    group   => 'root',
+  }
   class { '::omegaup::web':
     development_environment => $development_environment,
     hostname                => $hostname,
-    include_files           => ["${root}/frontend/server/nginx.rewrites"],
+    include_files           => ['/etc/nginx/sites-available/omegaup.com-nginx_rewrites.conf'],
     php_max_children        => $php_max_children,
     php_max_requests        => $php_max_requests,
     services_ensure         => $services_ensure,
     ssl                     => $ssl,
     web_root                => "${root}/frontend/www",
+    require                 => File['/etc/nginx/sites-available/omegaup.com-nginx_rewrites.conf'],
   }
 
   # Documentation
