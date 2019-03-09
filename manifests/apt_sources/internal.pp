@@ -1,3 +1,4 @@
+# APT source list.
 class omegaup::apt_sources::internal (
   $development_environment,
   $use_elastic_beats,
@@ -41,13 +42,13 @@ class omegaup::apt_sources::internal (
   # Development environment
   if ($development_environment) {
     apt::source { 'google-chrome':
-      location       => 'http://dl.google.com/linux/chrome/deb/',
-      release        => 'stable',
-      architecture   => 'amd64',
-      include        => {
+      location     => 'http://dl.google.com/linux/chrome/deb/',
+      release      => 'stable',
+      architecture => 'amd64',
+      include      => {
         src          => false,
       },
-      key            => {
+      key          => {
         key_location => 'https://dl.google.com/linux/linux_signing_key.pub',
         id           => 'EB4C1BFD4F042F6DDDCCEC917721F63BD38B4796'
       }
@@ -57,12 +58,12 @@ class omegaup::apt_sources::internal (
   # NewRelic
   if ($use_newrelic) {
     apt::source { 'newrelic-infra':
-      location       => 'https://download.newrelic.com/infrastructure_agent/linux/apt',
-      architecture   => 'amd64',
-      include        => {
+      location     => 'https://download.newrelic.com/infrastructure_agent/linux/apt',
+      architecture => 'amd64',
+      include      => {
         src          => false,
       },
-      key            => {
+      key          => {
         key_location => 'https://download.newrelic.com/infrastructure_agent/gpg/newrelic-infra.gpg',
         id           => 'A758B3FBCD43BE8D123A3476BB29EE038ECCE87C',
       },

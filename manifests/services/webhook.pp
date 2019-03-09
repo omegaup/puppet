@@ -28,11 +28,11 @@ class omegaup::services::webhook (
   # Configuration
   file { '/etc/omegaup/webhook':
     ensure  => 'directory',
-	} -> file { '/etc/omegaup/webhook/config.json':
+  } -> file { '/etc/omegaup/webhook/config.json':
     ensure  => 'file',
     owner   => 'omegaup-deploy',
     group   => 'omegaup-deploy',
-    mode    => '640',
+    mode    => '0640',
     content => template('omegaup/webhook/config.json.erb'),
     require => User['omegaup-deploy'],
   }
@@ -41,28 +41,28 @@ class omegaup::services::webhook (
     source  => 'puppet:///modules/omegaup/sudoers-omegaup-deploy',
     owner   => 'root',
     group   => 'root',
-    mode    => '440',
+    mode    => '0440',
     require => [User['omegaup-deploy'], Package['sudo']],
   }
   file { '/usr/bin/omegaup-webhook':
-    ensure  => 'file',
-    source  => 'puppet:///modules/omegaup/omegaup-webhook',
-    owner   => 'root',
-    group   => 'root',
-    mode    => '755',
+    ensure => 'file',
+    source => 'puppet:///modules/omegaup/omegaup-webhook',
+    owner  => 'root',
+    group  => 'root',
+    mode   => '0755',
   }
   file { '/usr/bin/omegaup-deploy-latest':
     ensure  => 'file',
     content => template('omegaup/webhook/omegaup-deploy-latest.erb'),
     owner   => 'root',
     group   => 'root',
-    mode    => '755',
+    mode    => '0755',
   }
   file { '/var/lib/omegaup/webhook':
     ensure  => 'directory',
     owner   => 'omegaup-deploy',
     group   => 'omegaup-deploy',
-    mode    => '750',
+    mode    => '0750',
     require => [User['omegaup-deploy'], File['/var/lib/omegaup']],
   }
 
@@ -70,7 +70,7 @@ class omegaup::services::webhook (
   file { '/etc/systemd/system/omegaup-webhook.service':
     ensure  => 'file',
     source  => 'puppet:///modules/omegaup/omegaup-webhook.service',
-    mode    => '644',
+    mode    => '0644',
     owner   => 'root',
     group   => 'root',
     require => File['/usr/bin/omegaup-webhook'],
@@ -82,25 +82,30 @@ class omegaup::services::webhook (
     provider   => 'systemd',
     hasrestart => true,
     restart    => '/bin/systemctl reload omegaup-webhook',
-    subscribe  => File['/usr/bin/omegaup-webhook',
-                       '/etc/omegaup/webhook/config.json',
-                       '/etc/systemd/system/omegaup-webhook.service'],
-    require    => File['/etc/systemd/system/omegaup-webhook.service',
-                       '/usr/bin/omegaup-webhook',
-                       '/usr/bin/omegaup-deploy-latest',
-                       '/etc/sudoers.d/omegaup-deploy',
-                       '/etc/omegaup/webhook/config.json',
-                       '/var/lib/omegaup/webhook'],
+    subscribe  => File[
+      '/usr/bin/omegaup-webhook',
+      '/etc/omegaup/webhook/config.json',
+      '/etc/systemd/system/omegaup-webhook.service',
+    ],
+    require    => File[
+      '/etc/systemd/system/omegaup-webhook.service',
+      '/usr/bin/omegaup-webhook',
+      '/usr/bin/omegaup-deploy-latest',
+      '/etc/sudoers.d/omegaup-deploy',
+      '/etc/omegaup/webhook/config.json',
+      '/var/lib/omegaup/webhook',
+    ],
   }
 
   # Webhook endpoint
   if $hostname != undef and $ssl != undef {
+    $server_name = $ssl ? {
+        true  => "${hostname}-ssl",
+        false => $hostname,
+      }
     nginx::resource::location { 'omegaup-org-webhook':
       ensure                => present,
-      server                => $ssl ? {
-        true                => "${hostname}-ssl",
-        false               => $hostname,
-      },
+      server                => $server_name,
       ssl                   => $ssl,
       ssl_only              => $ssl,
       location              => '/webhook',

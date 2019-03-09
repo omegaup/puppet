@@ -2,7 +2,7 @@
 file { '/usr/sbin/policy-rc.d':
   ensure  => present
   content => "#!/bin/sh\ncase \"${1}\" in\n  udev|systemd-logind) exit 101;;\nesac\n",
-  mode    => '755',
+  mode    => '0755',
 }
 # Ubuntu on Windows does not support Upstart. Fall back to 'init' for services.
 Service {

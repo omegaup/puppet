@@ -1,4 +1,6 @@
+# Wrapper for the omegaUp PHP frontend.
 class omegaup::web(
+  $web_root,
   $development_environment = false,
   $default_server = true,
   $hostname = 'localhost',
@@ -12,7 +14,6 @@ class omegaup::web(
   $try_files = undef,
   $services_ensure = running,
   $ssl = false,
-  $web_root,
 ) {
   # nginx
   file { '/var/www':
@@ -54,7 +55,7 @@ class omegaup::web(
       'PHP/post_max_size'       => '200M',
       'PHP/upload_max_filesize' => '200M',
     }, $php_development_settings),
-    fpm_pools     => {
+    fpm_pools    => {
       'www'       => {
         'listen'          => "/run/php/php${php_version}-fpm.sock",
         'listen_owner'    => 'www-data',
@@ -64,24 +65,24 @@ class omegaup::web(
       },
     },
     extensions   => {
-      apcu         => {
+      apcu     => {
         provider       => 'apt',
         package_prefix => 'php-',
         settings       => {
           'apc.enable_cli' => 1,
         },
       },
-      curl         => {
+      curl     => {
         provider   => 'apt',
       },
-      mbstring     => {
+      mbstring => {
         provider   => 'apt',
       },
-      mysql        => {
-        provider   => 'apt',
-        so_name    => 'mysqli',
+      mysql    => {
+        provider => 'apt',
+        so_name  => 'mysqli',
       },
-      zip          => {
+      zip      => {
         provider   => 'apt',
       },
     },

@@ -1,3 +1,4 @@
+# Support for the New Relic PHP plugin.
 class omegaup::new_relic (
   $license_key,
   $hostname = $::omegaup::hostname,
@@ -7,7 +8,7 @@ class omegaup::new_relic (
     ensure  => 'file',
     owner   => 'root',
     group   => 'root',
-    mode    => '644',
+    mode    => '0644',
     content => template('omegaup/newrelic/newrelic-infra.yml.erb'),
     notify  => Service['newrelic-infra'],
   }
@@ -15,8 +16,8 @@ class omegaup::new_relic (
     require  => Apt::Source['newrelic-infra'],
   }
   service { 'newrelic-infra':
-    ensure   => running,
-    require  => Package['newrelic-infra'],
+    ensure  => running,
+    require => Package['newrelic-infra'],
   }
 
   # New Relic sysmond
@@ -24,8 +25,8 @@ class omegaup::new_relic (
     require => Apt::Source['newrelic'],
   }
   service { 'newrelic-sysmond':
-    ensure   => running,
-    require  => Package['newrelic-sysmond'],
+    ensure  => running,
+    require => Package['newrelic-sysmond'],
   }
   ini_setting { 'nrsysmond.cfg license':
     path    => '/etc/newrelic/nrsysmond.cfg',
@@ -37,20 +38,20 @@ class omegaup::new_relic (
 
   # New Relic PHP extension
   file { '/usr/lib/php/20170718/newrelic.so':
-    ensure => link,
-    target => '/usr/lib/newrelic-php5/agent/x64/newrelic-20170718.so',
-    require  => [Package['newrelic-php5'], Package[$::php::fpm::package]],
+    ensure  => link,
+    target  => '/usr/lib/newrelic-php5/agent/x64/newrelic-20170718.so',
+    require => [Package['newrelic-php5'], Package[$::php::fpm::package]],
   } -> php::extension { 'newrelic-php5':
-    provider           => 'apt',
-    package_prefix     => '',
-    require            => Apt::Source['newrelic'],
-    sapi               => 'fpm',
-    so_name            => 'newrelic',
-    settings_prefix    => 'newrelic/newrelic',
-    settings           => {
+    provider        => 'apt',
+    package_prefix  => '',
+    require         => Apt::Source['newrelic'],
+    sapi            => 'fpm',
+    so_name         => 'newrelic',
+    settings_prefix => 'newrelic/newrelic',
+    settings        => {
       license                              => "\"${license_key}\"",
       appname                              => "\"${hostname}\"",
-      'browser_monitoring.auto_instrument' => 'false',
+      'browser_monitoring.auto_instrument' => false,
     },
   }
 }

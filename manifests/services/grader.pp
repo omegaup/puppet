@@ -37,7 +37,7 @@ class omegaup::services::grader (
     ensure  => 'file',
     owner   => 'omegaup',
     group   => 'omegaup',
-    mode    => '600',
+    mode    => '0600',
     content => template('omegaup/grader/config.json.erb'),
     require => File['/etc/omegaup/grader'],
   }
@@ -64,7 +64,7 @@ class omegaup::services::grader (
   }
   exec { 'submissions-directory-amend':
     command => '/bin/chown omegaup:omegaup /var/lib/omegaup/submissions/* && /bin/chmod 755 /var/lib/omegaup/submissions/*',
-    unless => '/usr/bin/test "$(/usr/bin/stat -c "%U:%G %a" /var/lib/omegaup/submissions/00)" = "omegaup:omegaup 755"',
+    unless  => '/usr/bin/test "$(/usr/bin/stat -c "%U:%G %a" /var/lib/omegaup/submissions/00)" = "omegaup:omegaup 755"',
     require => [Exec['submissions-directory'], User['omegaup']],
   }
   file { '/var/lib/omegaup/problems.git':
@@ -75,7 +75,7 @@ class omegaup::services::grader (
   }
   exec { 'problems.git-directory-amend':
     command => '/bin/chown omegaup:omegaup /var/lib/omegaup/problems.git/* && /bin/chmod 755 /var/lib/omegaup/problems.git/*',
-    unless => [
+    unless  => [
       '/usr/bin/test -z "$(/bin/ls -A /var/lib/omegaup/problems.git/)"',
       '/usr/bin/test "$(for problem in /var/lib/omegaup/problems.git/*/; do /usr/bin/stat -c "%U:%G %a" "${problem}"; break; done)" = "omegaup:omegaup 755"',
     ],
@@ -85,7 +85,7 @@ class omegaup::services::grader (
   # Service
   file { '/etc/systemd/system/omegaup-grader.service':
     ensure  => 'file',
-    mode    => '644',
+    mode    => '0644',
     owner   => 'root',
     group   => 'root',
     content => template('omegaup/grader/omegaup-grader.service.erb'),
@@ -124,7 +124,7 @@ class omegaup::services::grader (
   }
   file { '/etc/systemd/system/omegaup-gitserver.service':
     ensure  => 'file',
-    mode    => '644',
+    mode    => '0644',
     owner   => 'root',
     group   => 'root',
     content => template('omegaup/grader/omegaup-gitserver.service.erb'),

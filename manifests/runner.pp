@@ -1,3 +1,4 @@
+# Update APT packages.
 class { 'apt':
   update => {
     frequency => 'daily',
@@ -8,6 +9,7 @@ class { 'apt':
 stage { 'pre':
   before => Stage['main'],
 }
+# Stop the runner before doing anything else.
 class pre { # lint:ignore:autoloader_layout
   exec { 'stop_runner':
     command => '/bin/systemctl stop omegaup-runner',

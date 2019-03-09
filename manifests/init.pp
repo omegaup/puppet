@@ -1,3 +1,4 @@
+# omegaUp.
 class omegaup (
   $additional_php_config_settings = {},
   $broadcaster_host = 'http://localhost:39613',
@@ -76,7 +77,7 @@ class omegaup (
   file { '/etc/logrotate.d/omegaup':
     ensure  => 'file',
     source  => 'puppet:///modules/omegaup/omegaup.logrotate',
-    mode    => '644',
+    mode    => '0644',
     owner   => 'root',
     group   => 'root',
     require => Package['logrotate'],

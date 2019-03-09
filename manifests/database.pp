@@ -1,3 +1,4 @@
+# Support for MySQL.
 class omegaup::database (
   $root_password,
   $password,

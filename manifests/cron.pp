@@ -9,17 +9,17 @@ class omegaup::cron (
 
   user { ['omegaup-cron']: ensure => present }
   file { '/home/omegaup-cron':
-    ensure => 'directory',
+    ensure  => 'directory',
     owner   => 'omegaup-cron',
     group   => 'omegaup-cron',
-    mode    => '600',
+    mode    => '0600',
     require => User['omegaup-cron'],
   }
   file { '/home/omegaup-cron/.my.cnf':
     ensure  => 'file',
     owner   => 'omegaup-cron',
     group   => 'omegaup-cron',
-    mode    => '600',
+    mode    => '0600',
     content => template('omegaup/cron/my.cnf.template'),
     require => [File['/home/omegaup-cron'], User['omegaup-cron']],
   }
@@ -27,7 +27,7 @@ class omegaup::cron (
     ensure  => 'file',
     owner   => 'omegaup-cron',
     group   => 'omegaup-cron',
-    mode    => '644',
+    mode    => '0644',
     require => [File['/var/log/omegaup'], User['omegaup-cron']],
   }
 
@@ -36,8 +36,8 @@ class omegaup::cron (
   }
 
   cron::daily { 'aggregate_user_feedback':
-    command => "${root}/stuff/cron/aggregate_user_feedback.py",
     ensure  => absent,
+    command => "${root}/stuff/cron/aggregate_user_feedback.py",
   }
   cron::daily { 'aggregate_feedback':
     command => "${root}/stuff/cron/aggregate_feedback.py --logfile=/var/log/omegaup/cron.log",

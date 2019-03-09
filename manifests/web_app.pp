@@ -1,3 +1,4 @@
+# The omegaUp PHP frontend.
 class omegaup::web_app(
   $additional_php_config_settings = $::omegaup::additional_php_config_settings,
   $development_environment = $::omegaup::development_environment,
@@ -75,24 +76,26 @@ class omegaup::web_app(
     group   => 'www-data',
     require => Github[$root],
   }
+  $omegaup_url = $ssl ? {
+        true  => "https://${hostname}",
+        false => "http://${hostname}",
+  }
+  $omegaup_gitserver_secret_token = $gitserver_shared_token ? {
+        undef   => '',
+        default => $gitserver_shared_token,
+      }
   config_php { 'default settings':
     ensure   => present,
     settings => merge({
-      'OMEGAUP_DB_USER'                  => $mysql_user,
-      'OMEGAUP_DB_HOST'                  => $mysql_host,
-      'OMEGAUP_DB_PASS'                  => $mysql_password,
-      'OMEGAUP_DB_NAME'                  => 'omegaup',
-      'OMEGAUP_URL'                      => $ssl ? {
-        true                             => "https://${hostname}",
-        false                            => "http://${hostname}",
-      },
-      'OMEGAUP_SSLCERT_URL'              => '/etc/omegaup/frontend/certificate.pem',
-      'OMEGAUP_CACERT_URL'               => '/etc/omegaup/frontend/certificate.pem',
-      'OMEGAUP_GRADER_URL'               => "${grader_host}",
-      'OMEGAUP_GITSERVER_SECRET_TOKEN'   => $gitserver_shared_token ? {
-        undef                            => '',
-        default                          => $gitserver_shared_token,
-      },
+      'OMEGAUP_DB_USER'                => $mysql_user,
+      'OMEGAUP_DB_HOST'                => $mysql_host,
+      'OMEGAUP_DB_PASS'                => $mysql_password,
+      'OMEGAUP_DB_NAME'                => 'omegaup',
+      'OMEGAUP_URL'                    => $omegaup_url,
+      'OMEGAUP_SSLCERT_URL'            => '/etc/omegaup/frontend/certificate.pem',
+      'OMEGAUP_CACERT_URL'             => '/etc/omegaup/frontend/certificate.pem',
+      'OMEGAUP_GRADER_URL'             => $grader_host,
+      'OMEGAUP_GITSERVER_SECRET_TOKEN' => $omegaup_gitserver_secret_token,
     }, $additional_php_config_settings),
     path     => "${root}/frontend/server/config.php",
     owner    => $user,
@@ -100,13 +103,13 @@ class omegaup::web_app(
     require  => Github[$root],
   }
   exec { 'awscli':
-    command  => '/usr/bin/pip3 install --system --upgrade awscli',
-    creates  => '/usr/local/bin/aws',
-    require  => Package['python3-pip'],
+    command => '/usr/bin/pip3 install --system --upgrade awscli',
+    creates => '/usr/local/bin/aws',
+    require => Package['python3-pip'],
   }
   file { '/etc/nginx/sites-available/omegaup.com-nginx_rewrites.conf':
     content => template('omegaup/web_app/nginx.rewrites.erb'),
-    mode    => '644',
+    mode    => '0644',
     owner   => 'root',
     group   => 'root',
   }
@@ -124,7 +127,7 @@ class omegaup::web_app(
 
   # Documentation
   file { '/var/www/omegaup.com/docs':
-    ensure => 'directory',
+    ensure  => 'directory',
     require => [
       File['/var/www/omegaup.com'],
     ],
@@ -139,7 +142,7 @@ class omegaup::web_app(
     require  => File['/var/lib/omegaup'],
   }
   file { '/var/www/omegaup.com/docs/cpp':
-    ensure => 'directory',
+    ensure  => 'directory',
     owner   => 'www-data',
     group   => 'www-data',
     require => [
@@ -167,7 +170,7 @@ class omegaup::web_app(
     require  => File['/var/lib/omegaup'],
   }
   file { '/var/www/omegaup.com/docs/pas':
-    ensure => 'directory',
+    ensure  => 'directory',
     owner   => 'www-data',
     group   => 'www-data',
     require => [
@@ -176,7 +179,7 @@ class omegaup::web_app(
     ],
   }
   file { '/var/www/omegaup.com/docs/pas/en':
-    ensure => 'directory',
+    ensure  => 'directory',
     owner   => 'www-data',
     group   => 'www-data',
     require => [

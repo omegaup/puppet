@@ -1,3 +1,4 @@
+# omegaup.org.
 class omegaup::org_web (
   $hostname = 'omegaup.org',
   $default_server = true,

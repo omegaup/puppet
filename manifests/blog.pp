@@ -43,7 +43,7 @@ class omegaup::blog (
     host     => 'localhost',
     grant    => ['CREATE', 'SELECT', 'INSERT', 'UPDATE', 'DELETE'],
   }
-  file { "$wp_root/wp-content/uploads":
+  file { "${wp_root}/wp-content/uploads":
     ensure  => directory,
     owner   => 'www-data',
     group   => 'www-data',
@@ -55,13 +55,13 @@ class omegaup::blog (
     false => $hostname,
   }
   nginx::resource::location { "${hostname}-wp-ban-php-uploads":
-    ensure               => present,
-    server               => $nginx_server,
-    ssl                  => $ssl,
-    ssl_only             => $ssl,
-    location             => '~* /(?:uploads|files)/.*\.php$',
-    location_deny        => ['all'],
-    index_files          => [],
+    ensure        => present,
+    server        => $nginx_server,
+    ssl           => $ssl,
+    ssl_only      => $ssl,
+    location      => '~* /(?:uploads|files)/.*\.php$',
+    location_deny => ['all'],
+    index_files   => [],
   }
 }
 

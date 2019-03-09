@@ -14,7 +14,7 @@ class omegaup::services::broadcaster (
     ensure  => 'file',
     owner   => 'omegaup',
     group   => 'omegaup',
-    mode    => '600',
+    mode    => '0600',
     content => template('omegaup/broadcaster/config.json.erb'),
     require => File['/etc/omegaup/broadcaster'],
   }
@@ -32,7 +32,7 @@ class omegaup::services::broadcaster (
   file { '/etc/systemd/system/omegaup-broadcaster.service':
     ensure => 'file',
     source => 'puppet:///modules/omegaup/omegaup-broadcaster.service',
-    mode   => '644',
+    mode   => '0644',
     owner  => 'root',
     group  => 'root',
     notify => Exec['systemctl daemon-reload'],

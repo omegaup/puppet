@@ -1,3 +1,4 @@
+# The necessary APT sources for omegaUp.
 class omegaup::apt_sources (
   $development_environment = false,
   $use_elastic_beats       = false,

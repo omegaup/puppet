@@ -1,4 +1,6 @@
+# Support for PHP.
 define omegaup::web_host(
+  $web_root,
   $hostname = 'localhost',
   $default_server = true,
   $include_files = [],
@@ -6,7 +8,6 @@ define omegaup::web_host(
   $try_files = undef,
   $ssl = false,
   $php = true,
-  $web_root,
 ) {
   $nginx_server = $ssl ? {
     true  => "${hostname}-ssl",
@@ -28,12 +29,12 @@ define omegaup::web_host(
       creates => "/etc/ssl/private/${hostname}.dhparam",
     }
     nginx::resource::server { $hostname:
-      ensure            => present,
-      index_files       => [],
-      listen_port       => 80,
-      rewrite_rules     => ["^ https://${hostname}\$request_uri permanent"],
-      server_name       => [$hostname],
-      require           => File['/etc/nginx/conf.d/default.conf'],
+      ensure        => present,
+      index_files   => [],
+      listen_port   => 80,
+      rewrite_rules => ["^ https://${hostname}\$request_uri permanent"],
+      server_name   => [$hostname],
+      require       => File['/etc/nginx/conf.d/default.conf'],
     }
     nginx::resource::server { "${hostname}-ssl":
       ensure               => present,
@@ -65,8 +66,10 @@ define omegaup::web_host(
       },
       try_files            => $try_files,
       rewrite_rules        => $rewrite_rules,
-      require              => [File['/etc/nginx/conf.d/default.conf'],
-                               Exec["${hostname}.dhparam"]],
+      require              => [
+        File['/etc/nginx/conf.d/default.conf'],
+        Exec["${hostname}.dhparam"],
+      ],
     }
   } else {
     nginx::resource::server { $hostname:
@@ -104,10 +107,10 @@ define omegaup::web_host(
       proxy                => undef,
       fastcgi_script       => undef,
       location_cfg_prepend => {
-        expires            => '-1',
-        fastcgi_param      => 'SCRIPT_FILENAME $document_root$fastcgi_script_name',
-        fastcgi_index      => 'index.php',
-        fastcgi_keep_conn  => 'on',
+        expires           => '-1',
+        fastcgi_param     => 'SCRIPT_FILENAME $document_root$fastcgi_script_name',
+        fastcgi_index     => 'index.php',
+        fastcgi_keep_conn => 'on',
       },
     }
   }

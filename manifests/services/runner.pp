@@ -71,7 +71,7 @@ class omegaup::services::runner (
     ensure  => 'file',
     owner   => 'omegaup',
     group   => 'omegaup',
-    mode    => '644',
+    mode    => '0644',
     content => template('omegaup/runner/config.json.erb'),
   }
 
@@ -93,7 +93,7 @@ class omegaup::services::runner (
   # Service
   file { '/etc/systemd/system/omegaup-runner.service':
     ensure  => 'file',
-    mode    => '644',
+    mode    => '0644',
     owner   => 'root',
     group   => 'root',
     content => template('omegaup/runner/omegaup-runner.service.erb'),

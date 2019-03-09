@@ -1,3 +1,4 @@
+# Support for Filebeat to upload logs.
 class omegaup::filebeat (
   $environment,
   $logstash_host,
@@ -7,13 +8,13 @@ class omegaup::filebeat (
     require => Apt::Source['elastic-beats'],
   }
   file { '/etc/filebeat/filebeat.yml':
-    ensure   => 'file',
-    owner    => 'root',
-    group    => 'root',
-    mode     => '600',
-    content  => template($template),
-    require  => Package['filebeat'],
-    notify   => Service['filebeat'],
+    ensure  => 'file',
+    owner   => 'root',
+    group   => 'root',
+    mode    => '0600',
+    content => template($template),
+    require => Package['filebeat'],
+    notify  => Service['filebeat'],
   }
   service { 'filebeat':
     ensure     => running,

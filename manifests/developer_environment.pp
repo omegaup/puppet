@@ -1,3 +1,4 @@
+# Support for omegaUp in a VM.
 class omegaup::developer_environment (
   $root,
   $user,
@@ -29,16 +30,16 @@ class omegaup::developer_environment (
     creates => '/usr/local/bin/fixjsstyle',
   }
   exec { 'pycodestyle':
-    command  => '/usr/bin/pip3 install pycodestyle==2.5.0',
-    require  => Package['python3-pip'],
-    unless   => [
+    command => '/usr/bin/pip3 install pycodestyle==2.5.0',
+    require => Package['python3-pip'],
+    unless  => [
       '/bin/bash -c \'/usr/bin/python3 -m pip list 2>/dev/null | grep -E "^pycodestyle\s+\(?2.5.0\)?\$" > /dev/null\'',
     ],
   }
   exec { 'yapf':
-    command  => '/usr/bin/pip3 install yapf==0.25.0',
-    require  => Package['python3-pip'],
-    unless   => [
+    command => '/usr/bin/pip3 install yapf==0.25.0',
+    require => Package['python3-pip'],
+    unless  => [
       '/bin/bash -c \'/usr/bin/python3 -m pip list 2>/dev/null | grep -E "^yapf\s+\(?0.25.0\)?\$" > /dev/null\'',
     ],
   }
@@ -107,20 +108,22 @@ class omegaup::developer_environment (
     user        => 'root',
     refreshonly => true,
   }
-  package { ['google-chrome-stable', 'python3-pytest', 'python3-flaky',
-             'firefox']:
+  package { [
+    'google-chrome-stable', 'python3-pytest', 'python3-flaky', 'firefox',
+  ]:
     ensure  => present,
     require => Apt::Source['google-chrome'],
   }
   package { 'python3-selenium':
     ensure => absent,
   }
-  exec { 'selenium':
-    command  => '/usr/bin/pip3 install selenium',
-    creates  => $::lsbdistcodename ? {
+  $selenium_package_path = $::lsbdistcodename ? {
       'bionic' => '/usr/local/lib/python3.6/dist-packages/selenium',
       default  => '/usr/local/lib/python3.5/dist-packages/selenium',
     }
+  exec { 'selenium':
+    command => '/usr/bin/pip3 install selenium',
+    creates => $selenium_package_path,
   }
   remote_file { '/var/lib/omegaup/geckodriver_linux64.tar.gz':
     url      => 'https://github.com/mozilla/geckodriver/releases/download/v0.19.1/geckodriver-v0.19.1-linux64.tar.gz',
@@ -154,7 +157,7 @@ class omegaup::developer_environment (
   }
   file { "${root}/frontend/www/phpminiadmin/phpminiconfig.php":
     content => template('omegaup/developer_environment/phpminiconfig.php.erb'),
-    mode    => '644',
+    mode    => '0644',
     owner   => $user,
     group   => $user,
     require => File["${root}/frontend/www/phpminiadmin"],
