@@ -36,7 +36,11 @@ class omegaup::new_relic (
   }
 
   # New Relic PHP extension
-  php::extension { 'newrelic-php5':
+  file { '/usr/lib/php/20170718/newrelic.so':
+    ensure => link,
+    target => '/usr/lib/newrelic-php5/agent/x64/newrelic-20170718.so',
+    require  => [Package['newrelic-php5'], Package[$::php::fpm::package]],
+  } -> php::extension { 'newrelic-php5':
     provider           => 'apt',
     package_prefix     => '',
     require            => Apt::Source['newrelic'],
