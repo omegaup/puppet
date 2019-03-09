@@ -99,7 +99,7 @@ define omegaup::web_host(
       server               => $nginx_server,
       ssl                  => $ssl,
       ssl_only             => $ssl,
-      location             => '~ \.php$',
+      location             => '~ (\.php|^/status|^/ping)$',
       fastcgi              => "unix:/run/php/php${::omegaup::web::php_version}-fpm.sock",
       proxy                => undef,
       fastcgi_script       => undef,
