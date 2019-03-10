@@ -37,6 +37,11 @@ class omegaup::web(
     web_root       => $web_root,
   }
 
+  # Make sure the old deprecated APCu package is not present.
+  package { 'php-apcu':
+    ensure => absent,
+  }
+
   # PHP
   if $development_environment {
     $php_development_settings = {
@@ -66,11 +71,12 @@ class omegaup::web(
     },
     extensions   => {
       apcu     => {
-        ensure         => 'latest',
-        provider       => 'pecl',
-        settings       => {
+        ensure   => 'latest',
+        provider => 'pecl',
+        settings => {
           'apc.enable_cli' => 1,
         },
+        require  => Package['php-apcu'],
       },
       curl     => {
         provider   => 'apt',

@@ -50,8 +50,8 @@ class omegaup::new_relic (
       'browser_monitoring.auto_instrument' => false,
     },
   } -> file { '/usr/lib/php/20170718/newrelic.so':
-    ensure  => link,
-    target  => '/usr/lib/newrelic-php5/agent/x64/newrelic-20170718.so',
+    ensure => link,
+    target => '/usr/lib/newrelic-php5/agent/x64/newrelic-20170718.so',
   }
 }
 
