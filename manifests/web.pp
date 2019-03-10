@@ -66,8 +66,8 @@ class omegaup::web(
     },
     extensions   => {
       apcu     => {
-        provider       => 'apt',
-        package_prefix => 'php-',
+        ensure         => 'latest',
+        provider       => 'pecl',
         settings       => {
           'apc.enable_cli' => 1,
         },
