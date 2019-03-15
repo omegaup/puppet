@@ -36,7 +36,7 @@ class { '::omegaup::cron':
 class { '::omegaup::services': }
 
 omegaup::certmanager::cert { '/etc/omegaup/grader/key.pem':
-  hostname      => $hostname,
+  hostname      => 'localhost',
   password      => 'omegaup',
   owner         => 'omegaup',
   mode          => '600',
@@ -55,7 +55,7 @@ class { '::omegaup::services::runner':
   require           => Class['::omegaup::services'],
 }
 omegaup::certmanager::cert { '/etc/omegaup/broadcaster/key.pem':
-  hostname      => $hostname,
+  hostname      => 'localhost',
   password      => 'omegaup',
   owner         => 'omegaup',
   mode          => '600',
