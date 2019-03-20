@@ -33,9 +33,20 @@ Puppet::Type.type(:config_php).provide(:file, :parent => Puppet::Provider::Confi
 		settings = {}
 		if File.file?(@resource[:path])
 			File.foreach(@resource[:path]) {|line|
-				match = /define\('([a-zA-Z0-9_]+)',\s*'((?:\\'|[^'])*)'\);/.match(line)
+				match = /define\('([a-zA-Z0-9_]+)',\s*(.*)\s*\);\s*$/.match(line)
 				if match != nil
-					settings[match[1]] = match[2].gsub(/\\\'/, '\'')
+					key = match[1]
+					value = match[2]
+					if value.start_with?("'") && value.end_with?("'")
+						value = value[1..-2].gsub(/\\(.)/, '\1')
+					elsif value == "true"
+						value = true
+					elsif value == "false"
+						value = false
+					else
+						value = Integer(value)
+					end
+					settings[key] = value
 				end
 			}
 		end
@@ -47,7 +58,11 @@ Puppet::Type.type(:config_php).provide(:file, :parent => Puppet::Provider::Confi
 		File.open(@resource[:path], File::WRONLY|File::CREAT|File::TRUNC) {|f|
 			f.write("<?php\n")
 			s.sort.map {|key, value|
-				f.write("define('#{key}', '#{value.gsub(/'/, '\\\'')}');\n")
+				if value.is_a? String
+					f.write("define('#{key}', '#{value.gsub(/(['\\])/, '\\\\\1')}');\n")
+				else
+					f.write("define('#{key}', #{value});\n")
+				end
 			}
 		}
 		if newfile
