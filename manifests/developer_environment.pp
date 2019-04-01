@@ -43,6 +43,20 @@ class omegaup::developer_environment (
       '/bin/bash -c \'/usr/bin/python3 -m pip list 2>/dev/null | grep -E "^yapf\s+\(?0.25.0\)?\$" > /dev/null\'',
     ],
   }
+  exec { 'pyparsing':
+    command => '/usr/bin/pip3 install pyparsing==2.3.1',
+    require => Package['python3-pip'],
+    unless  => [
+      '/bin/bash -c \'/usr/bin/python3 -m pip list 2>/dev/null | grep -E "^pyparsing\s+\(?2.3.1\)?\$" > /dev/null\'',
+    ],
+  }
+  exec { 'jinja2':
+    command => '/usr/bin/pip3 install jinja2==2.10',
+    require => Package['python3-pip'],
+    unless  => [
+      '/bin/bash -c \'/usr/bin/python3 -m pip list 2>/dev/null | grep -E "^Jinja2\s+\(?2.10\)?\$" > /dev/null\'',
+    ],
+  }
   exec { 'vagrant-docker-permissions':
     command => '/usr/sbin/usermod -aG docker vagrant',
     unless  => '/usr/bin/test -n "$(/usr/bin/groups vagrant | grep docker)"',
