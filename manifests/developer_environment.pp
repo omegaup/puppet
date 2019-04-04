@@ -25,37 +25,24 @@ class omegaup::developer_environment (
     auto_update => false,
     path        => '/usr/bin/phpunit',
   } -> Anchor['php::end']
-  exec { 'closure-linter':
-    command => '/usr/bin/pip install https://github.com/google/closure-linter/zipball/master',
-    creates => '/usr/local/bin/fixjsstyle',
+  package { 'closure-linter':
+    provider => pip,
   }
-  exec { 'pycodestyle':
-    command => '/usr/bin/pip3 install pycodestyle==2.5.0',
-    require => Package['python3-pip'],
-    unless  => [
-      '/bin/bash -c \'/usr/bin/python3 -m pip list 2>/dev/null | grep -E "^pycodestyle\s+\(?2.5.0\)?\$" > /dev/null\'',
-    ],
+  package { 'pycodestyle':
+    ensure => '2.5.0',
+    provider => pip3,
   }
-  exec { 'yapf':
-    command => '/usr/bin/pip3 install yapf==0.25.0',
-    require => Package['python3-pip'],
-    unless  => [
-      '/bin/bash -c \'/usr/bin/python3 -m pip list 2>/dev/null | grep -E "^yapf\s+\(?0.25.0\)?\$" > /dev/null\'',
-    ],
+  package { 'yapf':
+    ensure => '0.25.0',
+    provider => pip3,
   }
-  exec { 'pyparsing':
-    command => '/usr/bin/pip3 install pyparsing==2.3.1',
-    require => Package['python3-pip'],
-    unless  => [
-      '/bin/bash -c \'/usr/bin/python3 -m pip list 2>/dev/null | grep -E "^pyparsing\s+\(?2.3.1\)?\$" > /dev/null\'',
-    ],
+  package { 'pyparsing':
+    ensure => '2.3.1',
+    provider => pip3,
   }
-  exec { 'jinja2':
-    command => '/usr/bin/pip3 install jinja2==2.10',
-    require => Package['python3-pip'],
-    unless  => [
-      '/bin/bash -c \'/usr/bin/python3 -m pip list 2>/dev/null | grep -E "^Jinja2\s+\(?2.10\)?\$" > /dev/null\'',
-    ],
+  package { 'jinja2':
+    ensure => '2.10',
+    provider => pip3,
   }
   exec { 'vagrant-docker-permissions':
     command => '/usr/sbin/usermod -aG docker vagrant',
@@ -131,13 +118,9 @@ class omegaup::developer_environment (
   package { 'python3-selenium':
     ensure => absent,
   }
-  $selenium_package_path = $::lsbdistcodename ? {
-      'bionic' => '/usr/local/lib/python3.6/dist-packages/selenium',
-      default  => '/usr/local/lib/python3.5/dist-packages/selenium',
-    }
-  exec { 'selenium':
-    command => '/usr/bin/pip3 install selenium',
-    creates => $selenium_package_path,
+  package { 'selenium':
+    ensure => present,
+    provider => pip3,
   }
   remote_file { '/var/lib/omegaup/geckodriver_linux64.tar.gz':
     url      => 'https://github.com/mozilla/geckodriver/releases/download/v0.19.1/geckodriver-v0.19.1-linux64.tar.gz',

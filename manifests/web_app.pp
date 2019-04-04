@@ -102,10 +102,9 @@ class omegaup::web_app(
     group    => $user,
     require  => Github[$root],
   }
-  exec { 'awscli':
-    command => '/usr/bin/pip3 install --system --upgrade awscli',
-    creates => '/usr/local/bin/aws',
-    require => Package['python3-pip'],
+  package { 'awscli':
+    ensure   => 'latest',
+    provider => pip3,
   }
   file { '/etc/nginx/sites-available/omegaup.com-nginx_rewrites.conf':
     content => template('omegaup/web_app/nginx.rewrites.erb'),
