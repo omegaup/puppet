@@ -1,4 +1,4 @@
-hiera_include('classes')
+lookup('classes', {merge => unique}).include
 
 # A few entries to avoid taking a dependency on ::omegaup.
 package { 'sudo':

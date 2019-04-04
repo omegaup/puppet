@@ -1,4 +1,4 @@
-hiera_include('classes')
+lookup('classes', {merge => unique}).include
 
 host { 'localhost':
   ensure => present,
