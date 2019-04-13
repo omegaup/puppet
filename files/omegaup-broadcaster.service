@@ -10,8 +10,6 @@ ExecStart=/usr/bin/omegaup-broadcaster
 ExecReload=/bin/kill -s HUP $MAINPID
 WorkingDirectory=/var/lib/omegaup
 Restart=always
-# This is a temporary workaround until this service moves to its own server.
-CPUQuota=40%
 
 [Install]
 WantedBy=multi-user.target
