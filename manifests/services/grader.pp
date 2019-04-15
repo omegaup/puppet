@@ -97,7 +97,7 @@ class omegaup::services::grader (
     provider  => 'systemd',
     subscribe => [
       File[
-        '/etc/omegaup/grader/config.json'
+        '/etc/omegaup/grader/config.json',
         '/etc/systemd/system/omegaup-grader.service',
         '/usr/bin/omegaup-grader',
       ],
@@ -110,7 +110,7 @@ class omegaup::services::grader (
         '/var/lib/omegaup/grade', '/var/log/omegaup/service.log',
         '/usr/bin/omegaup-grader',
         '/var/log/omegaup/tracing.json',
-        '/etc/omegaup/grader/config.json'
+        '/etc/omegaup/grader/config.json',
       ],
       Remote_File['/usr/share/java/libinteractive.jar'],
     ],
@@ -137,7 +137,7 @@ class omegaup::services::grader (
     provider  => 'systemd',
     subscribe => [
       File[
-        '/etc/systemd/system/omegaup-gitserver.service'
+        '/etc/systemd/system/omegaup-gitserver.service',
         '/usr/bin/omegaup-gitserver',
       ],
       Exec['omegaup-gitserver'],
@@ -146,7 +146,7 @@ class omegaup::services::grader (
       File[
         '/etc/systemd/system/omegaup-gitserver.service',
         '/var/log/omegaup/gitserver.log',
-        '/var/lib/omegaup/problems.git'
+        '/var/lib/omegaup/problems.git',
       ],
     ],
   }
