@@ -43,8 +43,9 @@ class omegaup::services::broadcaster (
     provider  => 'systemd',
     subscribe => [
       File[
-        '/usr/bin/omegaup-broadcaster',
         '/etc/omegaup/broadcaster/config.json'
+        '/etc/systemd/system/omegaup-broadcaster.service',
+        '/usr/bin/omegaup-broadcaster',
       ],
       Exec['omegaup-backend'],
     ],

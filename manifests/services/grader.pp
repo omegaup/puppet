@@ -97,8 +97,9 @@ class omegaup::services::grader (
     provider  => 'systemd',
     subscribe => [
       File[
-        '/usr/bin/omegaup-grader',
         '/etc/omegaup/grader/config.json'
+        '/etc/systemd/system/omegaup-grader.service',
+        '/usr/bin/omegaup-grader',
       ],
       Exec['omegaup-backend'],
     ],
@@ -136,13 +137,15 @@ class omegaup::services::grader (
     provider  => 'systemd',
     subscribe => [
       File[
-        '/usr/bin/omegaup-gitserver', '/var/log/omegaup/gitserver.log',
         '/etc/systemd/system/omegaup-gitserver.service'
+        '/usr/bin/omegaup-gitserver',
       ],
+      Exec['omegaup-gitserver'],
     ],
     require   => [
       File[
         '/etc/systemd/system/omegaup-gitserver.service',
+        '/var/log/omegaup/gitserver.log',
         '/var/lib/omegaup/problems.git'
       ],
     ],
