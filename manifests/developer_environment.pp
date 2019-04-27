@@ -29,20 +29,24 @@ class omegaup::developer_environment (
     provider => pip,
   }
   package { 'pycodestyle':
-    ensure => '2.5.0',
+    ensure   => '2.5.0',
     provider => pip3,
+    require  => Package['python3-pip'],
   }
   package { 'yapf':
-    ensure => '0.25.0',
+    ensure   => '0.25.0',
     provider => pip3,
+    require  => Package['python3-pip'],
   }
   package { 'pyparsing':
-    ensure => '2.3.1',
+    ensure   => '2.3.1',
     provider => pip3,
+    require  => Package['python3-pip'],
   }
   package { 'jinja2':
-    ensure => '2.10',
+    ensure   => '2.10',
     provider => pip3,
+    require  => Package['python3-pip'],
   }
   exec { 'vagrant-docker-permissions':
     command => '/usr/sbin/usermod -aG docker vagrant',
@@ -119,8 +123,9 @@ class omegaup::developer_environment (
     ensure => absent,
   }
   package { 'selenium':
-    ensure => present,
+    ensure   => present,
     provider => pip3,
+    require  => Package['python3-pip'],
   }
   remote_file { '/var/lib/omegaup/geckodriver_linux64.tar.gz':
     url      => 'https://github.com/mozilla/geckodriver/releases/download/v0.19.1/geckodriver-v0.19.1-linux64.tar.gz',

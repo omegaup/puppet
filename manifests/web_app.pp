@@ -105,6 +105,7 @@ class omegaup::web_app(
   package { 'awscli':
     ensure   => 'latest',
     provider => pip3,
+    require  => Package['python3-pip'],
   }
   file { '/etc/nginx/sites-available/omegaup.com-nginx_rewrites.conf':
     content => template('omegaup/web_app/nginx.rewrites.erb'),
