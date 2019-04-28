@@ -6,7 +6,7 @@ MODULEPATH="$(/usr/bin/puppet config print modulepath | sed -e 's/:.*//')/omegau
 (cd "${MODULEPATH}" && git pull --rebase origin master)
 
 # Apply the latest changes.
-puppet apply --detailed-exitcodes \
+puppet apply --detailed-exitcodes --disable_warnings=deprecations \
   "${MODULEPATH}/manifests/<%= @manifest_name %>.pp"
 
 exitcode=$?
