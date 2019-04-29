@@ -32,8 +32,8 @@ class omegaup::services {
   }
 
   remote_file { '/var/lib/omegaup/omegaup-gitserver.tar.xz':
-    url      => 'https://github.com/omegaup/gitserver/releases/download/v1.3.9/omegaup-gitserver.tar.xz',
-    sha1hash => '83f9c18bcf1e7fbb250c44071573883aed4600c6',
+    url      => 'https://github.com/omegaup/gitserver/releases/download/v1.3.10/omegaup-gitserver.tar.xz',
+    sha1hash => '87a10ae44d6034ecb28705271fbd44f3fe30e607',
     mode     => '644',
     owner    => 'root',
     group    => 'root',
