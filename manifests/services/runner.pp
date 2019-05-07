@@ -10,8 +10,8 @@ class omegaup::services::runner (
   include omegaup::directories
 
   remote_file { '/var/lib/omegaup/omegaup-runner.tar.xz':
-    url      => 'https://github.com/omegaup/quark/releases/download/v1.1.7/omegaup-runner.tar.xz',
-    sha1hash => '58ce49e65cc2b77501f748aad151b366736d7f40',
+    url      => 'https://github.com/omegaup/quark/releases/download/v1.1.13/omegaup-runner.tar.xz',
+    sha1hash => '458cdd97b2a59578b21e491519d885ef8392d31f',
     mode     => '644',
     owner    => 'root',
     group    => 'root',
