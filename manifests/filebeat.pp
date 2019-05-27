@@ -7,7 +7,7 @@ class omegaup::filebeat () {
     ensure => absent,
   }
   service { 'filebeat':
-    ensure => absent,
+    ensure => stopped,
   }
 }
 # vim:expandtab ts=2 sw=2
