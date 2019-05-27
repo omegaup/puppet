@@ -1,7 +1,6 @@
 # The necessary APT sources for omegaUp.
 class omegaup::apt_sources (
   $development_environment = false,
-  $use_elastic_beats       = false,
   $use_newrelic            = false,
 ) {
   # Stages
@@ -25,7 +24,6 @@ class omegaup::apt_sources (
     stage                   => init,
     development_environment => $development_environment,
     use_newrelic            => $use_newrelic,
-    use_elastic_beats       => $use_elastic_beats,
   }
 }
 

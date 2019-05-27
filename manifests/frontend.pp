@@ -17,7 +17,6 @@ file { '/etc/omegaup/frontend':
 }
 class { '::omegaup::apt_sources':
   use_newrelic            => true,
-  use_elastic_beats       => true,
   development_environment => false,
 }
 class { '::omegaup::web_app': }
@@ -89,8 +88,6 @@ exec { 'delete-templates':
 class { '::omegaup::new_relic': }
 
 # Filebeat
-class { '::omegaup::filebeat':
-  template => 'omegaup/filebeat/frontend.yml.erb',
-}
+class { '::omegaup::filebeat': }
 
 # vim:expandtab ts=2 sw=2

@@ -11,7 +11,6 @@ exec { 'systemctl daemon-reload':
 
 class { '::omegaup::apt_sources':
   use_newrelic            => true,
-  use_elastic_beats       => true,
   development_environment => false,
 }
 class { '::omegaup::web_app': }
@@ -26,9 +25,7 @@ class { '::omegaup::database':
   require => Class['::omegaup::apt_sources'],
 }
 
-class { '::omegaup::filebeat':
-  template => 'omegaup/filebeat/frontend.yml.erb',
-}
+class { '::omegaup::filebeat': }
 class { '::omegaup::services::webhook':
   manifest_name => 'frontend_org',
   require       => Class['::omegaup::apt_sources'],

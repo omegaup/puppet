@@ -8,13 +8,10 @@ host { 'localhost':
 
 class { '::omegaup::apt_sources':
   use_newrelic            => false,
-  use_elastic_beats       => true,
   development_environment => false,
 }
 
 # Filebeat
-class { '::omegaup::filebeat':
-  template => 'omegaup/filebeat/frontend.yml.erb',
-}
+class { '::omegaup::filebeat': }
 
 # vim:expandtab ts=2 sw=2

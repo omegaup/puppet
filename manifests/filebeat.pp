@@ -1,26 +1,13 @@
 # Support for Filebeat to upload logs.
-class omegaup::filebeat (
-  $environment,
-  $logstash_host,
-  $template,
-) {
+class omegaup::filebeat () {
   package { 'filebeat':
-    require => Apt::Source['elastic-beats'],
+    ensure => absent,
   }
   file { '/etc/filebeat/filebeat.yml':
-    ensure  => 'file',
-    owner   => 'root',
-    group   => 'root',
-    mode    => '0600',
-    content => template($template),
-    require => Package['filebeat'],
-    notify  => Service['filebeat'],
+    ensure => absent,
   }
   service { 'filebeat':
-    ensure     => running,
-    enable     => true,
-    hasrestart => true,
-    require    => File['/etc/filebeat/filebeat.yml'],
+    ensure => absent,
   }
 }
 # vim:expandtab ts=2 sw=2

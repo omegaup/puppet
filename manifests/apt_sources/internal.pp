@@ -1,11 +1,14 @@
 # APT source list.
 class omegaup::apt_sources::internal (
   $development_environment,
-  $use_elastic_beats,
   $use_newrelic,
 ) {
   # HHVM
   apt::source { 'hhvm':
+    ensure => absent,
+  }
+  # Elastic beats
+  apt::source { 'elastic-beats':
     ensure => absent,
   }
 
@@ -79,21 +82,6 @@ class omegaup::apt_sources::internal (
         key_location => 'https://download.newrelic.com/548C16BF.gpg',
         id           => 'B60A3EC9BC013B9C23790EC8B31B29E5548C16BF',
       },
-    }
-  }
-
-  # Elastic beats
-  if ($use_elastic_beats) {
-    apt::source { 'elastic-beats':
-      location => 'http://packages.elastic.co/beats/apt',
-      release  => 'stable',
-      include  => {
-        src    => false,
-      },
-      key      => {
-        key_location => 'https://packages.elastic.co/GPG-KEY-elasticsearch',
-        id           => '46095ACC8548582C1A2699A9D27D666CD88E42B4',
-      }
     }
   }
 }
