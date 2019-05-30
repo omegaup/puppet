@@ -15,22 +15,10 @@ class omegaup::services::grader (
   $root = '/opt/omegaup',
   $services_ensure = running,
 ) {
-  include omegaup::users
-  include omegaup::scripts
   include omegaup::directories
-
-  # libinteractive
-  package { 'openjdk-8-jre-headless':
-    ensure => installed,
-  }
-  remote_file { '/usr/share/java/libinteractive.jar':
-    url      => 'https://github.com/omegaup/libinteractive/releases/download/v2.0.24/libinteractive.jar',
-    sha1hash => 'a6345604d5d61168658660abbf1ade07fb22983a',
-    mode     => '644',
-    owner    => 'root',
-    group    => 'root',
-    require  => Package['openjdk-8-jre-headless'],
-  }
+  include omegaup::libinteractive
+  include omegaup::scripts
+  include omegaup::users
 
   # Configuration
   file { '/etc/omegaup/grader/config.json':

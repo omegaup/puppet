@@ -22,6 +22,8 @@ class omegaup::web_app(
   $ssl = $::omegaup::ssl,
   $user = $::omegaup::user,
 ) {
+  include omegaup::directories
+
   # Repository
   file { $root:
     ensure => 'directory',
