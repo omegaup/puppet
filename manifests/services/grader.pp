@@ -5,7 +5,6 @@ class omegaup::services::grader (
   $embedded_runner = true,
   $broadcaster_host = 'https://localhost:32672',
   $frontend_host = 'http://localhost',
-  $gitserver_shared_token = $::omegaup::gitserver_shared_token,
   $keystore_password = 'omegaup',
   $local_database = true,
   $mysql_db = 'omegaup',
@@ -55,20 +54,6 @@ class omegaup::services::grader (
     unless  => '/usr/bin/test "$(/usr/bin/stat -c "%U:%G %a" /var/lib/omegaup/submissions/00)" = "omegaup:omegaup 755"',
     require => [Exec['submissions-directory'], User['omegaup']],
   }
-  file { '/var/lib/omegaup/problems.git':
-    ensure  => 'directory',
-    owner   => 'omegaup',
-    group   => 'omegaup',
-    require => File['/var/lib/omegaup'],
-  }
-  exec { 'problems.git-directory-amend':
-    command => '/bin/chown omegaup:omegaup /var/lib/omegaup/problems.git/* && /bin/chmod 755 /var/lib/omegaup/problems.git/*',
-    unless  => [
-      '/usr/bin/test -z "$(/bin/ls -A /var/lib/omegaup/problems.git/)"',
-      '/usr/bin/test "$(for problem in /var/lib/omegaup/problems.git/*/; do /usr/bin/stat -c "%U:%G %a" "${problem}"; break; done)" = "omegaup:omegaup 755"',
-    ],
-    require => [File['/var/lib/omegaup/problems.git'], User['omegaup']],
-  }
 
   # Service
   file { '/etc/systemd/system/omegaup-grader.service':
@@ -101,41 +86,6 @@ class omegaup::services::grader (
         '/etc/omegaup/grader/config.json',
       ],
       Remote_File['/usr/share/java/libinteractive.jar'],
-    ],
-  }
-
-  # Git service
-  file { '/var/log/omegaup/gitserver.log':
-    ensure  => 'file',
-    owner   => 'omegaup',
-    group   => 'omegaup',
-    require => File['/var/log/omegaup'],
-  }
-  file { '/etc/systemd/system/omegaup-gitserver.service':
-    ensure  => 'file',
-    mode    => '0644',
-    owner   => 'root',
-    group   => 'root',
-    content => template('omegaup/grader/omegaup-gitserver.service.erb'),
-    notify  => Exec['systemctl daemon-reload'],
-  }
-  service { 'omegaup-gitserver':
-    ensure    => $services_ensure,
-    enable    => true,
-    provider  => 'systemd',
-    subscribe => [
-      File[
-        '/etc/systemd/system/omegaup-gitserver.service',
-        '/usr/bin/omegaup-gitserver',
-      ],
-      Exec['omegaup-gitserver'],
-    ],
-    require   => [
-      File[
-        '/etc/systemd/system/omegaup-gitserver.service',
-        '/var/log/omegaup/gitserver.log',
-        '/var/lib/omegaup/problems.git',
-      ],
     ],
   }
 }

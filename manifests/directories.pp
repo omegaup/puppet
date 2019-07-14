@@ -2,7 +2,7 @@
 class omegaup::directories {
   file { ['/var/lib/omegaup', '/var/log/omegaup', '/etc/omegaup']:
     ensure => 'directory',
-  } -> file { ['/etc/omegaup/grader', '/etc/omegaup/broadcaster']:
+  } -> file { ['/etc/omegaup/grader', '/etc/omegaup/gitserver', '/etc/omegaup/broadcaster']:
     ensure => 'directory',
   }
 }

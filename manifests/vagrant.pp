@@ -50,6 +50,9 @@ class { '::omegaup::services::grader':
   require           => [Omegaup::Certmanager::Cert['/etc/omegaup/grader/key.pem'],
                         Class['::omegaup::services']],
 }
+class { '::omegaup::services::gitserver':
+  mysql_password    => 'omegaup',
+}
 class { '::omegaup::services::runner':
   keystore_password => 'omegaup',
   require           => Class['::omegaup::services'],
