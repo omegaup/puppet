@@ -18,6 +18,8 @@ _GITHUB_TOKEN = None
 _HOSTNAME = None
 _REMOTE_REF = None
 _SLACK_WEBHOOK_URL = None
+_NEWRELIC_API_KEY = None
+_NEWRELIC_APPLICATION_ID = None
 _WEBHOOK_ROOT = '/var/lib/omegaup/webhook'
 
 _CONDITION = threading.Condition()
@@ -119,6 +121,38 @@ def _slack_report_status(commit, state):
                      response.reason, response.read())
     except http.client.HTTPException:
         logging.exception('Failed to send slack status for commit %s', commit)
+    finally:
+        conn.close()
+
+
+def _newrelic_report_deployment(commit):
+    if not _NEWRELIC_APPLICATION_ID or not _NEWRELIC_API_KEY:
+        return
+
+    payload = json.dumps({
+        'deployment': {
+            'revision': commit,
+            'user': 'webhook',
+        }
+    }).encode('utf-8')
+    headers = {
+        'Content-Type': 'application/json',
+        'Content-Length': str(len(payload)),
+        'User-Agent': 'omegaup-webhook',
+        'Connection': 'close',
+        'X-Api-Key': _NEWRELIC_API_KEY,
+    }
+    url = urllib.parse.urlparse(
+        'https://api.newrelic.com/v2/applications/{}/deployments.json'.format(
+            _NEWRELIC_APPLICATION_ID))
+    conn = http.client.HTTPSConnection(url.hostname, 443)
+    try:
+        conn.request('POST', url.path, payload, headers)
+        response = conn.getresponse()
+        logging.info('Response: Status %d %s. Contents: %r', response.status,
+                     response.reason, response.read())
+    except http.client.HTTPException:
+        logging.exception('Failed to send New Relic deployment status for commit %s', commit)
     finally:
         conn.close()
 
@@ -229,6 +263,7 @@ class DeployThread(threading.Thread):
                 _github_report_status(commit, deployment_id, 'success',
                                       'Deployment on %s succeeded' % (_HOSTNAME,))
                 _slack_report_status(commit, 'success')
+                _newrelic_report_deployment(commit)
 
 
 def _signal_handler(signum, frame):
@@ -240,7 +275,7 @@ def _signal_handler(signum, frame):
 
 def main():
     global _GITHUB_SECRET, _GITHUB_TOKEN, _HOSTNAME, _HTTP_SERVER, _REMOTE_REF, \
-            _SLACK_WEBHOOK_URL
+            _SLACK_WEBHOOK_URL, _NEWRELIC_APPLICATION_ID, _NEWRELIC_API_KEY
 
     logging.basicConfig(level=logging.INFO)
 
@@ -251,6 +286,9 @@ def main():
         _GITHUB_TOKEN = config['GitHub']['OAuthToken']
         _REMOTE_REF = 'refs/heads/%s' % config['GitHub']['Branch']
         _SLACK_WEBHOOK_URL = config['Slack']['WebhookURL']
+        if config['NewRelic']:
+            _NEWRELIC_APPLICATION_ID = config['NewRelic']['ApplicationID']
+            _NEWRELIC_API_KEY = config['NewRelic']['ApiKey']
 
     logging.info('Starting the webhook service')
     deploy_thread = DeployThread(daemon=True)

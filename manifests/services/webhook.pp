@@ -12,6 +12,8 @@ class omegaup::services::webhook (
   $manifest_name = 'frontend',
   $services_ensure = running,
   $slack_webhook_url = undef,
+  $newrelic_application_id = undef,
+  $newrelic_api_key = undef
 ) {
   include omegaup::users
 

@@ -7,5 +7,13 @@
   },
   "Slack": {
     "WebhookURL": "<%= @slack_webhook_url %>"
+  },
+<% if @newrelic_application_id != nil and @newrelic_api_key != nil -%>
+  "NewRelic": {
+    "ApplicationID": "<%= @newrelic_application_id %>",
+    "ApiKey": "<%= @newrelic_api_key %>"
   }
+<% else -%>
+  "NewRelic": null
+<% end -%>
 }
