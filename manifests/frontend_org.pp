@@ -16,10 +16,12 @@ class { '::omegaup::apt_sources':
 class { '::omegaup::web_app': }
 class { '::omegaup::users': }
 class { '::omegaup::blog':
-  require => Class['::omegaup::web'],
+  require        => Class['::omegaup::web'],
+  default_server => false,
 }
 class { '::omegaup::org_web':
-  require => Class['::omegaup::apt_sources'],
+  require        => Class['::omegaup::apt_sources'],
+  default_server => true,
 }
 class { '::omegaup::database':
   require => Class['::omegaup::apt_sources'],

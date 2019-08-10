@@ -1,6 +1,6 @@
 # Configures the omegaUp blog.
 class omegaup::blog (
-  $default_server = true,
+  $default_server = false,
   $hostname = 'localhost',
   $ssl = false,
   $wordpress_db_name = 'blog',
