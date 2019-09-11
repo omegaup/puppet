@@ -164,6 +164,21 @@ class omegaup::developer_environment (
     group   => $user,
     require => File["${root}/frontend/www/phpminiadmin"],
   }
+
+  # composer
+  exec { 'getcomposer':
+    command => '/usr/bin/curl https://raw.githubusercontent.com/composer/getcomposer.org/76a7060ccb93902cd7576b67264ad91c8a2700e2/web/installer -o - -s | /usr/bin/php -- --quiet',
+    user    => 'root',
+    creates => '/usr/local/bin/composer',
+    require => [Package['curl'], Class['::php']],
+  }
+  exec { 'composer install':
+    command     => '/usr/local/bin/composer install',
+    environment => ["HOME=/home/${user}"],
+    user        => $user,
+    cwd         => $root,
+    require     => [Github[$root], Exec['getcomposer']],
+  }
 }
 
 # vim:expandtab ts=2 sw=2
