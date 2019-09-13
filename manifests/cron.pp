@@ -46,6 +46,13 @@ class omegaup::cron (
     user    => 'omegaup-cron',
     require => [Github[$root], User['omegaup-cron']],
   }
+  cron::daily { 'assign_badges':
+    command => "${root}/stuff/cron/assign_badges.py --logfile=/var/log/omegaup/cron.log",
+    minute  => 23,
+    hour    => 9,
+    user    => 'omegaup-cron',
+    require => [Github[$root], User['omegaup-cron']],
+  }
   cron::hourly { 'update_user_rank':
     command => "${root}/stuff/cron/update_user_rank.py --logfile=/var/log/omegaup/cron.log",
     minute  => 19,
