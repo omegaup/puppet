@@ -179,6 +179,11 @@ class omegaup::developer_environment (
     cwd         => $root,
     require     => [Github[$root], Exec['getcomposer']],
   }
+
+  # hook_tools
+  docker::image { 'omegaup/hook_tools':
+    image_tag => 'latest',
+  }
 }
 
 # vim:expandtab ts=2 sw=2
