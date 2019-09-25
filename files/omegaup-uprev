@@ -6,6 +6,7 @@ set -x
 STAGING=/opt/omegaup-staging
 JS_DIST=frontend/www/js/dist/
 CSS_DIST=frontend/www/css/dist/
+MEDIA_DIST=frontend/www/media/dist/
 YARN=node_modules/yarn/bin/yarn
 
 # Compile Vue files. This complicated version is needed to ensure that the
@@ -13,8 +14,8 @@ YARN=node_modules/yarn/bin/yarn
 sudo -u omegaup-www -i /bin/bash -c \
 	"set -e;
    cd \"${STAGING}\";
-   rm -rf \"${STAGING}/${JS_DIST}\" \"${STAGING}/${CSS_DIST}\";
-   mkdir -p \"${STAGING}/${JS_DIST}\" \"${STAGING}/${CSS_DIST}\";
+   rm -rf \"${STAGING}/${JS_DIST}\" \"${STAGING}/${CSS_DIST}\" \"${STAGING}/${MEDIA_DIST}\";
+   mkdir -p \"${STAGING}/${JS_DIST}\" \"${STAGING}/${CSS_DIST}\" \"${STAGING}/${MEDIA_DIST}\";
    COMMIT=\$(git rev-parse HEAD);
    curl \"https://s3.amazonaws.com/omegaup-build-artifacts/webpack-artifacts/\${COMMIT}.tar.xz\" | \
      tar --xz --extract --no-same-owner --no-same-permissions -C \"${STAGING}/frontend/www\" && \

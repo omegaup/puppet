@@ -73,6 +73,11 @@ exec { 'copy-css':
   subscribe   => [Exec['omegaup-uprev'], Github[$::omegaup::root]],
   refreshonly => true,
 }
+exec { 'copy-media':
+  command     => '/usr/bin/rsync -a --delete /opt/omegaup-staging/frontend/www/media/dist/ /opt/omegaup/frontend/www/media/dist/',
+  subscribe   => [Exec['omegaup-uprev'], Github[$::omegaup::root]],
+  refreshonly => true,
+}
 exec { 'nginx-reload':
   command     => '/bin/systemctl reload nginx',
   subscribe   => Github[$::omegaup::root],
