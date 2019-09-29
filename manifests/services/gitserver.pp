@@ -1,6 +1,7 @@
 # The omegaUp grader service.
 class omegaup::services::gitserver (
   $hostname = 'localhost',
+  $frontend_host = 'http://localhost',
   $gitserver_shared_token = $::omegaup::gitserver_shared_token,
   $mysql_db = 'omegaup',
   $mysql_host = 'localhost',

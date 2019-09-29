@@ -4,10 +4,11 @@
 		"DataSourceName": "<%= @mysql_user %>:<%= @mysql_password %>@<% if @mysql_host != "localhost" %>(<%= @mysql_host %>:3306)<% end %>/<%= @mysql_db %>"
 	},
 	"Gitserver": {
-<% if @gitserver_shared_token %>
+<% if @gitserver_shared_token -%>
 		"PublicKey": "",
 		"SecretToken": "<%= @gitserver_shared_token %>",
-<% end %>
+<% end -%>
+		"FrontendAuthorizationProblemRequestURL": "<%= @frontend_host %>/api/authorization/problem/",
 		"AllowDirectPushToMaster": true
 	}
 }
