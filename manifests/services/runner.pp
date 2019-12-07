@@ -10,8 +10,8 @@ class omegaup::services::runner (
   include omegaup::directories
 
   remote_file { '/var/lib/omegaup/omegaup-runner.tar.xz':
-    url      => 'https://github.com/omegaup/quark/releases/download/v1.1.13/omegaup-runner.tar.xz',
-    sha1hash => '458cdd97b2a59578b21e491519d885ef8392d31f',
+    url      => 'https://github.com/omegaup/quark/releases/download/v1.1.22/omegaup-runner.tar.xz',
+    sha1hash => '6e30b7dca7a232fa3a3df692d3ddcdcc587de5d4',
     mode     => '644',
     owner    => 'root',
     group    => 'root',
@@ -37,19 +37,33 @@ class omegaup::services::runner (
     require => Exec['omegaup-runner'],
   }
 
-  remote_file { '/var/lib/omegaup/omegajail-xenial-distrib-x86_64.tar.bz2':
-    url      => 'https://omegaup-omegajail.s3.amazonaws.com/omegajail-xenial-distrib-x86_64.tar.bz2',
-    sha1hash => '35c7c21fc58e904ca8a62882654bfefe1b6e9aba',
+  file { '/var/lib/omegaup/omegajail-xenial-distrib-x86_64.tar.bz2':
+    ensure => absent,
+  }
+  remote_file { '/var/lib/omegaup/omegajail-bionic-distrib-x86_64.tar.xz':
+    url      => 'https://omegaup-omegajail.s3.amazonaws.com/omegajail-bionic-distrib-x86_64.tar.xz',
+    sha1hash => '259d110aeac2b904831a446f87bdbbdacaad8995',
+    mode     => '644',
+    owner    => 'root',
+    group    => 'root',
+    require  => File['/var/lib/omegaup'],
+  }
+  remote_file { '/var/lib/omegaup/omegajail-bionic-rootfs-x86_64.tar.xz':
+    url      => 'https://omegaup-omegajail.s3.amazonaws.com/omegajail-bionic-rootfs-x86_64.tar.xz',
+    sha1hash => '490b126d5248e6601d5c12a3b437e26a7191516c',
     mode     => '644',
     owner    => 'root',
     group    => 'root',
     require  => File['/var/lib/omegaup'],
   }
   exec { 'omegajail-distrib':
-    command     => '/bin/tar -xf /var/lib/omegaup/omegajail-xenial-distrib-x86_64.tar.bz2 -C /',
+    command     => '/bin/rm -rf /var/lib/omegajail && /bin/tar -xf /var/lib/omegaup/omegajail-bionic-rootfs-x86_64.tar.xz -C / && /bin/tar -xf /var/lib/omegaup/omegajail-bionic-distrib-x86_64.tar.xz -C /',
     user        => 'root',
     notify      => File['/var/lib/omegajail/bin/omegajail'],
-    subscribe   => Remote_File['/var/lib/omegaup/omegajail-xenial-distrib-x86_64.tar.bz2'],
+    subscribe   => [
+      Remote_File['/var/lib/omegaup/omegajail-bionic-rootfs-x86_64.tar.xz'],
+      Remote_File['/var/lib/omegaup/omegajail-bionic-distrib-x86_64.tar.xz'],
+    ],
     refreshonly => true,
   }
   file { '/var/lib/omegajail/bin/omegajail':
