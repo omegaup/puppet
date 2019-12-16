@@ -1,6 +1,6 @@
 #!/bin/bash
 
-MODULEPATH="$(/usr/bin/puppet config print modulepath | sed -e 's/:.*//')/omegaup"
+MODULEPATH="$(/usr/bin/puppet config print modulepath | sed -e 's/.*://')/omegaup"
 
 # Update the Puppet files
 (cd "${MODULEPATH}" && git pull --rebase origin master)
