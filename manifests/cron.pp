@@ -54,7 +54,11 @@ class omegaup::cron (
     require => [Github[$root], User['omegaup-cron']],
   }
   cron::hourly { 'update_user_rank':
+    ensure  => absent,
     command => "${root}/stuff/cron/update_user_rank.py --logfile=/var/log/omegaup/cron.log",
+  }
+  cron::hourly { 'update_ranks':
+    command => "${root}/stuff/cron/update_ranks.py --logfile=/var/log/omegaup/cron.log",
     minute  => 19,
     user    => 'omegaup-cron',
     require => [Github[$root], User['omegaup-cron']],
