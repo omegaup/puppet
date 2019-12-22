@@ -71,5 +71,5 @@
 	compress
 	delaycompress
 	dateext
-	create 0644 omegaup-cron omegaup-cron
+	create 0664 omegaup-cron omegaup
 }
