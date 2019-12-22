@@ -7,7 +7,9 @@ class omegaup::grader_cron (
   include omegaup::directories
   include cron
 
-  file { '/etc/omegaup/grader/aws_credentials',
+  user { ['omegaup-cron']: ensure => present }
+
+  file { '/etc/omegaup/grader/aws_credentials':
     ensure  => 'file',
     owner   => 'omegaup',
     group   => 'omegaup',
@@ -16,6 +18,18 @@ class omegaup::grader_cron (
     require => [
       User['omegaup'],
       File['/etc/omegaup/grader'],
+    ],
+  }
+
+  file { '/var/log/omegaup/cron.log':
+    ensure  => 'file',
+    owner   => 'omegaup-cron',
+    group   => 'omegaup',
+    mode    => '0664',
+    require => [
+      User['omegaup'],
+      User['omegaup-cron'],
+      File['/var/log/omegaup'],
     ],
   }
 
@@ -41,6 +55,7 @@ class omegaup::grader_cron (
     require => [
       User['omegaup'],
       File['/etc/omegaup/grader/aws_credentials'],
+      File['/var/log/omegaup/cron.log'],
     ],
   }
 }
