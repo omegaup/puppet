@@ -1,12 +1,7 @@
 [Unit]
 Description=omegaUp grading service
-<% if @local_database %>
-Requires=mysql.service omegaup-gitserver.service
-After=network.target mysql.service omegaup-gitserver.service
-<% else %>
-Requires=mysql.service omegaup-gitserver.service
-After=omegaup-gitserver.service
-<% end %>
+Requires=<% if @local_database %>mysql.service <% end %>omegaup-gitserver.service
+After=network.target <% if @local_database %>mysql.service <% end %>omegaup-gitserver.service
 
 [Service]
 Type=notify
