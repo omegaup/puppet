@@ -10,8 +10,8 @@ class omegaup::services::runner (
   include omegaup::directories
 
   remote_file { '/var/lib/omegaup/omegaup-runner.tar.xz':
-    url      => 'https://github.com/omegaup/quark/releases/download/v1.1.25/omegaup-runner.tar.xz',
-    sha1hash => 'b7b724676e09a431205d8890ea7d84834ee227b3',
+    url      => 'https://github.com/omegaup/quark/releases/download/v1.1.27/omegaup-runner.tar.xz',
+    sha1hash => '3dbc98b643a699719f2f9b02ec32c51cec2b4a48',
     mode     => '644',
     owner    => 'root',
     group    => 'root',
@@ -42,7 +42,7 @@ class omegaup::services::runner (
   }
   remote_file { '/var/lib/omegaup/omegajail-bionic-distrib-x86_64.tar.xz':
     url      => 'https://omegaup-omegajail.s3.amazonaws.com/omegajail-bionic-distrib-x86_64.tar.xz',
-    sha1hash => '58d7fb723aebfe7eace95badc8ff9b4b497ba7ef',
+    sha1hash => '10b1762cf07c189bf01701e6c23396313f69f087',
     mode     => '644',
     owner    => 'root',
     group    => 'root',
