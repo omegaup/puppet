@@ -7,6 +7,7 @@ class omegaup::web(
   $include_files = [],
   $php_version = $::lsbdistcodename ? {
     'bionic' => '7.2',
+    'focal'  => '7.4',
     default  => '7.0',
   },
   $php_max_children = 36,
@@ -23,6 +24,10 @@ class omegaup::web(
     service_ensure       => $services_ensure,
     manage_repo          => false,
     worker_rlimit_nofile => 8192,
+  }
+  file { '/etc/nginx/sites-enabled/default':
+    ensure  => absent,
+    require => Package['nginx'],
   }
   file { '/etc/nginx/conf.d/default.conf':
     ensure  => absent,
@@ -52,6 +57,7 @@ class omegaup::web(
   } else {
     $php_development_settings = {}
   }
+
   class { '::php':
     ensure       => latest,
     manage_repos => false,
@@ -84,9 +90,8 @@ class omegaup::web(
       mbstring => {
         provider   => 'apt',
       },
-      mysql    => {
+      mysqli   => {
         provider => 'apt',
-        so_name  => 'mysqli',
       },
       zip      => {
         provider   => 'apt',

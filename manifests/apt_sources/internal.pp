@@ -12,23 +12,25 @@ class omegaup::apt_sources::internal (
     ensure => absent,
   }
 
-  # Nginx
-  apt::source { 'nginx':
-    location => 'https://nginx.org/packages/mainline/ubuntu',
-    repos    => 'nginx',
-    key      => '573BFD6B3D8FBC641079A6ABABF5BD827BD9BF62',
-  }
+  if $::lsbdistcodename != 'focal' {
+    # Nginx
+    apt::source { 'nginx':
+      location => 'https://nginx.org/packages/mainline/ubuntu',
+      repos    => 'nginx',
+      key      => '573BFD6B3D8FBC641079A6ABABF5BD827BD9BF62',
+    }
 
-  # NPM/yarn
-  apt::source { 'nodesource':
-    location => 'https://deb.nodesource.com/node_11.x',
-    include  => {
-      src    => false,
-    },
-    key      => {
-      key_location => 'https://deb.nodesource.com/gpgkey/nodesource.gpg.key',
-      id           => '9FD3B784BC1C6FC31A8A0A1C1655A0AB68576280',
-    },
+    # NPM/yarn
+    apt::source { 'nodesource':
+      location => 'https://deb.nodesource.com/node_11.x',
+      include  => {
+        src    => false,
+      },
+      key      => {
+        key_location => 'https://deb.nodesource.com/gpgkey/nodesource.gpg.key',
+        id           => '9FD3B784BC1C6FC31A8A0A1C1655A0AB68576280',
+      },
+    }
   }
   apt::source { 'yarn':
     location => 'https://dl.yarnpkg.com/debian/',
