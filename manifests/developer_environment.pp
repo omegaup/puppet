@@ -19,9 +19,9 @@ class omegaup::developer_environment (
   }
   Anchor['php::begin'] -> exec { 'delete-older-phpunit':
     command => '/bin/rm -f /usr/bin/phpunit',
-    unless  => '/usr/bin/test -f /usr/bin/phpunit && /usr/bin/phpunit --atleast-version 6.5.9',
+    unless  => '/usr/bin/test -f /usr/bin/phpunit && /usr/bin/phpunit --atleast-version 8.5.2',
   } -> class { '::php::phpunit':
-    source      => 'https://phar.phpunit.de/phpunit-6.5.9.phar',
+    source      => 'https://phar.phpunit.de/phpunit-8.5.2.phar',
     auto_update => false,
     path        => '/usr/bin/phpunit',
   } -> Anchor['php::end']
