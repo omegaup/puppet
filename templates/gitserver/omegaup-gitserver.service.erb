@@ -1,6 +1,7 @@
 [Unit]
 Description=omegaUp git service
-After=network.target
+After=network.target<% if @local_database %> mysql.service<% end %>
+<% if @local_database %>Requires=mysql.service<% end %>
 
 [Service]
 Type=notify
