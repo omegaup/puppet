@@ -8,9 +8,8 @@ class omegaup::database (
   class { '::mysql::server':
     root_password    => $root_password,
     service_provider => $service_provider,
+    package_ensure   => '8.0.19-1ubuntu18.04',
   }
-
-  include '::mysql::server'
 
   mysql::db { 'omegaup':
     user     => 'omegaup',

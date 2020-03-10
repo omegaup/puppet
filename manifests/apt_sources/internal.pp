@@ -31,6 +31,20 @@ class omegaup::apt_sources::internal (
         id           => '9FD3B784BC1C6FC31A8A0A1C1655A0AB68576280',
       },
     }
+
+    # MySQL
+    apt::source { 'mysql':
+      location => 'http://repo.mysql.com/apt/ubuntu/',
+      repos    => 'mysql-8.0 mysql-tools mysql-apt-config',
+      key      => {
+        id     => 'A4A9406876FCBD3C456770C88C718D3B5072E1F5',
+        server => 'hkp://keyserver.ubuntu.com:80',
+      },
+      include => {
+        src   => false,
+        deb   => true,
+      },
+    }
   }
   apt::source { 'yarn':
     location => 'https://dl.yarnpkg.com/debian/',
