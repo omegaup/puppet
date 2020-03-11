@@ -184,6 +184,15 @@ class omegaup::developer_environment (
   docker::image { 'omegaup/hook_tools':
     image_tag => 'latest',
   }
+
+  # MySQL
+  file { '/etc/mysql/conf.d/mysql_password.cnf':
+    content => template('omegaup/developer_environment/mysql_password.cnf.erb'),
+    mode    => '0644',
+    owner   => 'root',
+    group   => 'root',
+    require => [Class['::mysql::server']],
+  }
 }
 
 # vim:expandtab ts=2 sw=2
