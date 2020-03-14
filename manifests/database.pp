@@ -8,7 +8,10 @@ class omegaup::database (
   class { '::mysql::server':
     root_password    => $root_password,
     service_provider => $service_provider,
-    package_ensure   => '8.0.19-1ubuntu18.04',
+    package_ensure   => $::lsbdistcodename ? {
+      'focal' => 'present',
+      default => '8.0.19-1ubuntu18.04',
+    },
   }
 
   mysql::db { 'omegaup':
