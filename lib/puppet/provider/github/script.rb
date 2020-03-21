@@ -10,11 +10,9 @@ Puppet::Type.type(:github).provide(:git, :parent => Puppet::Provider::GitHub) do
     if !Pathname(@resource[:path]).join('.git').directory?
       return false
     end
-    Dir.chdir(@resource[:path]) do
-      @resource[:remotes].to_h.each do |name, repo|
-        if !Pathname(@resource[:path]).join('.git/remotes/refs').join(name).directory?
-          return false
-        end
+    @resource[:remotes].to_h.each do |name, repo|
+      if !Pathname(@resource[:path]).join('.git/refs/remotes').join(name).directory?
+        return false
       end
     end
     return true
@@ -24,22 +22,24 @@ Puppet::Type.type(:github).provide(:git, :parent => Puppet::Provider::GitHub) do
     Dir.chdir(@resource[:path]) do
       execute([command(:git), 'fetch', '-q',
                @resource[:origin], @resource[:branch]],
-              { :failonfail => true, :uid => uid, :gid => gid })
+              { :cwd => @resource[:path], :failonfail => true,
+                :combine => true, :uid => uid, :gid => gid })
       begin
         head, fetch_head = execute([command(:git), 'rev-parse',
                                     'HEAD^{commit}', 'FETCH_HEAD^{commit}'],
-                                   { :failonfail => true, :uid => uid,
-                                     :gid => gid }).lines()
+                                   { :cwd => @resource[:path],
+                                     :failonfail => true, :combine => true,
+                                     :uid => uid, :gid => gid }).lines()
         if head != fetch_head
           return false
         end
       rescue Puppet::ExecutionFailure
         return false
       end
-      @resource[:remotes].to_h.each do |name, repo|
-        if !Pathname(@resource[:path]).join('.git/remotes/refs').join(name).directory?
-          return false
-        end
+    end
+    @resource[:remotes].to_h.each do |name, repo|
+      if !Pathname(@resource[:path]).join('.git/refs/remotes').join(name).directory?
+        return false
       end
     end
     return true
@@ -48,15 +48,18 @@ Puppet::Type.type(:github).provide(:git, :parent => Puppet::Provider::GitHub) do
   def common_sync
     Dir.chdir(@resource[:path]) do
       execute([command(:git), 'submodule', 'update', '--init', '--recursive'],
-             { :failonfail => true, :uid => uid, :gid => gid })
+              { :cwd => @resource[:path], :failonfail => true,
+                :combine => true, :uid => uid, :gid => gid })
       @resource[:remotes].to_h.each do |name, repo|
-        if !Pathname(@resource[:path]).join('.git/remotes/refs').join(name).directory?
+        if !Pathname(@resource[:path]).join('.git/refs/remotes').join(name).directory?
           execute([command(:git), 'remote', 'add', name,
                    "https://github.com/#{repo}.git"],
-                  { :failonfail => false, :uid => uid, :gid => gid })
+                  { :cwd => @resource[:path], :failonfail => true,
+                    :combine => true, :uid => uid, :gid => gid })
         end
         execute([command(:git), 'fetch', '-q', name],
-                { :failonfail => true, :uid => uid, :gid => gid })
+                { :cwd => @resource[:path], :failonfail => true,
+                  :combine => true, :uid => uid, :gid => gid })
       end
     end
   end
@@ -69,23 +72,26 @@ Puppet::Type.type(:github).provide(:git, :parent => Puppet::Provider::GitHub) do
     Dir.chdir(@resource[:path]) do
       execute([command(:git), 'fetch', '-q',
                @resource[:origin], @resource[:branch]],
-              { :failonfail => true, :uid => uid, :gid => gid })
+              { :cwd => @resource[:path], :failonfail => true,
+                :combine => true, :uid => uid, :gid => gid })
       execute([command(:git), 'reset', '--hard', 'FETCH_HEAD^{commit}'],
-              { :failonfail => true, :uid => uid, :gid => gid })
-      common_sync
+              { :cwd => @resource[:path], :failonfail => true,
+                :combine => true, :uid => uid, :gid => gid })
     end
+    common_sync
   end
 
   def create
-    Dir.chdir(@resource[:path]) do
-      if !Pathname(@resource[:path]).join('.git').directory?
+    if !Pathname(@resource[:path]).join('.git').directory?
+      Dir.chdir(@resource[:path]) do
         execute([command(:git), 'clone',
-               "https://github.com/#{@resource[:repo]}.git",
-               '-o', @resource[:origin], '-b', @resource[:branch], '.'],
-               { :failonfail => true, :uid => uid, :gid => gid })
+                 "https://github.com/#{@resource[:repo]}.git",
+                 '-o', @resource[:origin], '-b', @resource[:branch], '.'],
+                { :cwd => @resource[:path], :failonfail => true,
+                  :combine => true, :uid => uid, :gid => gid })
       end
-      common_sync
     end
+    common_sync
   end
 
   def destroy
