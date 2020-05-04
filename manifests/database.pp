@@ -10,7 +10,7 @@ class omegaup::database (
     service_provider => $service_provider,
     package_ensure   => $::lsbdistcodename ? {
       'focal' => 'present',
-      default => '8.0.19-1ubuntu18.04',
+      default => '8.0.20-1ubuntu18.04',
     },
   }
 
