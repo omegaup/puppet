@@ -27,6 +27,6 @@ esac
 <% if !@database_migration_args.empty? %>
 # Perform a database migration
 (cd /opt/omegaup && \
-  ./stuff/db-migrate.py migrate <%= @database_migration_args.join(" ") %>)
+  ./stuff/db-migrate.py <%= @database_migration_args.join(" ") %>)
 <% end %>
 exit 0
