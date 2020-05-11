@@ -19,12 +19,12 @@ class omegaup::services::webhook (
 
   if $force_database_migration {
     if defined('$::omegaup::development_environment') and $::omegaup::development_environment {
-      $force_database_migration_args = ['--development-environment']
+      $database_migration_args = ['--development-environment'] + $::omegaup::database_migration_args
     } else {
-      $force_database_migration_args = ['--databases', 'omegaup']
+      $database_migration_args = ['--databases', 'omegaup'] + $::omegaup::database_migration_args
     }
   } else {
-    $force_database_migration_args = []
+    $database_migration_args = $::omegaup::database_migration_args
   }
 
   # Configuration

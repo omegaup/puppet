@@ -11,6 +11,7 @@ class omegaup (
   $grader_host = 'https://localhost:21680',
   $hostname = 'localhost',
   $local_database = false,
+  $database_migration_args = [],
   $mysql_host = 'localhost',
   $mysql_password = undef,
   $mysql_user = 'omegaup',
@@ -46,6 +47,7 @@ class omegaup (
     dbmigrate { $root:
       ensure                  => latest,
       development_environment => $development_environment,
+      database_migration_args => $database_migration_args,
       subscribe               => [Github[$root], Mysql::Db['omegaup']],
     }
 

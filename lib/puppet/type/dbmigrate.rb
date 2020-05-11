@@ -25,6 +25,10 @@ Puppet::Type.newtype(:dbmigrate) do
   newparam(:development_environment) do
     desc "Whether this is a development environment"
   end
+
+  newparam(:database_migration_args) do
+    desc "Additional arguments to the migration script"
+  end
 end
 
 # vim: expandtab shiftwidth=2 tabstop=2
