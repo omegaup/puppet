@@ -10,34 +10,43 @@ import re
 import signal
 import subprocess
 import threading
-import urllib
+import urllib.parse
+from typing import Any, Dict, List, Optional, Tuple, TypeVar
 
 _COMMIT_RE = re.compile('^/([0-9a-f]{2})([0-9a-f]{38})$')
-_GITHUB_SECRET = None
+_GITHUB_SECRET = b''
 _GITHUB_TOKEN = None
 _HOSTNAME = None
 _REMOTE_REF = None
-_SLACK_WEBHOOK_URL = None
+_SLACK_WEBHOOK_URL = ''
 _NEWRELIC_API_KEY = None
 _NEWRELIC_APPLICATION_ID = None
 _WEBHOOK_ROOT = '/var/lib/omegaup/webhook'
 
 _CONDITION = threading.Condition()
-_HTTP_SERVER = None
-_QUEUE = []
+_HTTP_SERVER: Optional[http.server.HTTPServer] = None
+_QUEUE: List[Optional[Tuple[str, int]]] = []
 
 
-def _github_report_status(commit, deployment_id, state, description):
+def _github_report_status(commit: str, deployment_id: int, state: str,
+                          description: str) -> None:
     status_payload = json.dumps({
-        'state': state,
-        'target_url': 'https://%s/webhook/%s' % (_HOSTNAME, commit),
-        'description': description,
-        'context': 'deployment/%s/push' % (_HOSTNAME,)
+        'state':
+        state,
+        'target_url':
+        'https://%s/webhook/%s' % (_HOSTNAME, commit),
+        'description':
+        description,
+        'context':
+        'deployment/%s/push' % (_HOSTNAME, )
     }).encode('utf-8')
     deployment_payload = json.dumps({
-        'state': state,
-        'log_url': 'https://%s/webhook/%s' % (_HOSTNAME, commit),
-        'description': description
+        'state':
+        state,
+        'log_url':
+        'https://%s/webhook/%s' % (_HOSTNAME, commit),
+        'description':
+        description
     }).encode('utf-8')
     headers = {
         'Authorization': 'token %s' % _GITHUB_TOKEN,
@@ -49,34 +58,39 @@ def _github_report_status(commit, deployment_id, state, description):
     conn = http.client.HTTPSConnection('api.github.com', 443)
     try:
         try:
-            conn.request('POST',
-                         '/repos/omegaup/omegaup/statuses/%s' % commit,
-                         status_payload,
-                         {**headers, **{'Content-Length': str(len(status_payload))}}),
+            conn.request('POST', '/repos/omegaup/omegaup/statuses/%s' % commit,
+                         status_payload, {
+                             **headers,
+                             **{
+                                 'Content-Length': str(len(status_payload))
+                             }
+                         })
             response = conn.getresponse()
-            logging.info('Response: Status %d %s. Contents: %r', response.status,
-                         response.reason, response.read())
+            logging.info('Response: Status %d %s. Contents: %r',
+                         response.status, response.reason, response.read())
         except http.client.HTTPException:
             logging.exception('Failed to send status for commit %s', commit)
         try:
-            conn.request('POST',
-                         '/repos/omegaup/omegaup/deployments/%d/statuses' % deployment_id,
-                         deployment_payload,
-                         {**headers, **{'Content-Length': str(len(deployment_payload))}}),
+            conn.request(
+                'POST', '/repos/omegaup/omegaup/deployments/%d/statuses' %
+                deployment_id, deployment_payload, {
+                    **headers,
+                    **{
+                        'Content-Length': str(len(deployment_payload))
+                    }
+                })
             response = conn.getresponse()
-            logging.info('Response: Deployment %d %s. Contents: %r', response.status,
-                         response.reason, response.read())
+            logging.info('Response: Deployment %d %s. Contents: %r',
+                         response.status, response.reason, response.read())
         except http.client.HTTPException:
-            logging.exception('Failed to send status for deployment %s', deployment_id)
+            logging.exception('Failed to send status for deployment %s',
+                              deployment_id)
     finally:
         conn.close()
 
 
-def _slack_report_status(commit, state):
-    _COLOR_MAPPING = {
-        'success': 'good',
-        'failure': 'danger'
-    }
+def _slack_report_status(commit: str, state: str) -> None:
+    _COLOR_MAPPING = {'success': 'good', 'failure': 'danger'}
     format_args = {
         'commit': commit,
         'short_commit': commit[:8],
@@ -91,19 +105,26 @@ def _slack_report_status(commit, state):
                      '{state}').format_map(format_args),
             'fields': [
                 {
-                    'title': 'Commit',
-                    'value': '<https://github.com/omegaup/omegaup/commit/{commit}|{short_commit}>'.format_map(
-                        format_args),
-                    'short': True
+                    'title':
+                    'Commit',
+                    'value':
+                    '<https://github.com/omegaup/omegaup/commit/{commit}|{short_commit}>'
+                    .format_map(format_args),
+                    'short':
+                    True
                 },
                 {
-                    'title': 'Logs',
-                    'value': '<https://{hostname}/webhook/{commit}|View>'.format_map(
+                    'title':
+                    'Logs',
+                    'value':
+                    '<https://{hostname}/webhook/{commit}|View>'.format_map(
                         format_args),
-                    'short': True
+                    'short':
+                    True
                 },
             ],
-            'color': _COLOR_MAPPING.get(state, 'danger')
+            'color':
+            _COLOR_MAPPING.get(state, 'danger')
         }]
     }).encode('utf-8')
     headers = {
@@ -113,6 +134,7 @@ def _slack_report_status(commit, state):
         'Connection': 'close',
     }
     url = urllib.parse.urlparse(_SLACK_WEBHOOK_URL)
+    assert url.hostname
     conn = http.client.HTTPSConnection(url.hostname, 443)
     try:
         conn.request('POST', url.path, payload, headers)
@@ -125,7 +147,7 @@ def _slack_report_status(commit, state):
         conn.close()
 
 
-def _newrelic_report_deployment(commit):
+def _newrelic_report_deployment(commit: str) -> None:
     if not _NEWRELIC_APPLICATION_ID or not _NEWRELIC_API_KEY:
         return
 
@@ -152,18 +174,19 @@ def _newrelic_report_deployment(commit):
         logging.info('Response: Status %d %s. Contents: %r', response.status,
                      response.reason, response.read())
     except http.client.HTTPException:
-        logging.exception('Failed to send New Relic deployment status for commit %s', commit)
+        logging.exception(
+            'Failed to send New Relic deployment status for commit %s', commit)
     finally:
         conn.close()
 
 
 class GitHubWebhookHandler(http.server.BaseHTTPRequestHandler):
-    def do_POST(self):
+    def do_POST(self) -> None:
         try:
             content_len = int(self.headers.get('Content-Length', 0))
             raw_payload = self.rfile.read(content_len)
-            expected_hmac = 'sha1=%s' % hmac.new(_GITHUB_SECRET, raw_payload,
-                                                 digestmod='sha1').hexdigest()
+            expected_hmac = 'sha1=%s' % hmac.new(
+                _GITHUB_SECRET, raw_payload, digestmod='sha1').hexdigest()
             if self.headers.get('X-Hub-Signature', '') != expected_hmac:
                 self.send_response(401)
                 return
@@ -181,7 +204,7 @@ class GitHubWebhookHandler(http.server.BaseHTTPRequestHandler):
         finally:
             self.end_headers()
 
-    def do_GET(self):
+    def do_GET(self) -> None:
         logging.info(self.path)
         match = _COMMIT_RE.match(self.path)
         try:
@@ -191,7 +214,8 @@ class GitHubWebhookHandler(http.server.BaseHTTPRequestHandler):
                 self.send_header('Content-Length', '0')
                 self.end_headers()
                 return
-            logpath = os.path.join(_WEBHOOK_ROOT, match.group(1), match.group(2))
+            logpath = os.path.join(_WEBHOOK_ROOT, match.group(1),
+                                   match.group(2))
             if not os.path.isfile(logpath):
                 logging.error('File not found: %s', logpath)
                 self.send_response(404)
@@ -208,25 +232,26 @@ class GitHubWebhookHandler(http.server.BaseHTTPRequestHandler):
         except:
             logging.exception('Failed to send reply')
 
-    def handle_hook_event(self, event, payload):
+    def handle_hook_event(self, event: str, payload: Dict[str, Any]) -> None:
         global _QUEUE, _CONDITION, _REMOTE_REF
 
         logging.info('Request %s, %r', event, payload)
         if event != 'deployment':
             logging.info('Ignoring non-deployment event: %s', event)
             return
-        if 'refs/heads/%s' % payload['deployment']['ref'] != _REMOTE_REF:
-            logging.info('Ignoring non-%s ref: %s', _REMOTE_REF,
+        if _REMOTE_REF not in (payload['deployment']['ref'],
+                               'refs/heads/%s' % payload['deployment']['ref']):
+            logging.info('Ignoring non-%r ref: %s', _REMOTE_REF,
                          payload['deployment']['ref'])
             return
         with _CONDITION:
-            _QUEUE.append((payload['deployment']['sha'],
-                           payload['deployment']['id']))
+            _QUEUE.append(
+                (payload['deployment']['sha'], payload['deployment']['id']))
             _CONDITION.notify()
 
 
 class DeployThread(threading.Thread):
-    def run(self):
+    def run(self) -> None:
         global _QUEUE, _CONDITION
         while True:
             with _CONDITION:
@@ -237,43 +262,50 @@ class DeployThread(threading.Thread):
                 if payload is None:
                     logging.info('Received empty payload. Sending shutdown '
                                  'signal to the server.')
+                    assert _HTTP_SERVER
                     _HTTP_SERVER.shutdown()
                     logging.info('Terminating deploy loop.')
                     return
                 commit, deployment_id = payload
                 logging.info('Deploying %s...', commit)
-                _github_report_status(commit, deployment_id, 'pending',
-                                      'Starting deployment on %s' % (_HOSTNAME,))
-                logpath = os.path.join(_WEBHOOK_ROOT, commit[:2],
-                                       commit[2:])
+                _github_report_status(
+                    commit, deployment_id, 'pending',
+                    'Starting deployment on %s' % (_HOSTNAME, ))
+                logpath = os.path.join(_WEBHOOK_ROOT, commit[:2], commit[2:])
                 os.makedirs(os.path.dirname(logpath), exist_ok=True)
                 with open(logpath, 'wb') as logfile:
-                    res = subprocess.run(['/usr/bin/sudo',
-                                          '/usr/bin/omegaup-deploy-latest'],
-                                          stdout=logfile,
-                                          stderr=subprocess.STDOUT)
+                    res = subprocess.run(
+                        ['/usr/bin/sudo', '/usr/bin/omegaup-deploy-latest'],
+                        stdout=logfile,
+                        stderr=subprocess.STDOUT)
                 if res.returncode != 0:
-                    logging.error('Error calling omegaup-deploy-latest for %s', commit)
-                    _github_report_status(commit, deployment_id, 'failure',
-                                          'Deployment on %s failed' % (_HOSTNAME,))
+                    logging.error('Error calling omegaup-deploy-latest for %s',
+                                  commit)
+                    _github_report_status(
+                        commit, deployment_id, 'failure',
+                        'Deployment on %s failed' % (_HOSTNAME, ))
                     _slack_report_status(commit, 'failure')
                     continue
 
                 logging.info('Successfully deployed %s', commit)
-                _github_report_status(commit, deployment_id, 'success',
-                                      'Deployment on %s succeeded' % (_HOSTNAME,))
+                _github_report_status(
+                    commit, deployment_id, 'success',
+                    'Deployment on %s succeeded' % (_HOSTNAME, ))
                 _slack_report_status(commit, 'success')
                 _newrelic_report_deployment(commit)
 
 
-def _signal_handler(signum, frame):
+FrameType = TypeVar('FrameType')
+
+
+def _signal_handler(signum: int, frame: FrameType) -> None:
     logging.info('Received signal %d', signum)
     with _CONDITION:
         _QUEUE.append(None)
         _CONDITION.notify()
 
 
-def main():
+def main() -> None:
     global _GITHUB_SECRET, _GITHUB_TOKEN, _HOSTNAME, _HTTP_SERVER, _REMOTE_REF, \
             _SLACK_WEBHOOK_URL, _NEWRELIC_APPLICATION_ID, _NEWRELIC_API_KEY
 
@@ -294,7 +326,7 @@ def main():
     deploy_thread = DeployThread(daemon=True)
     deploy_thread.start()
     server_address = ('localhost', 58517)
-    logging.info('Listening on %r' % (server_address,))
+    logging.info('Listening on %r' % (server_address, ))
     _HTTP_SERVER = http.server.HTTPServer(server_address, GitHubWebhookHandler)
 
     signal.signal(signal.SIGHUP, _signal_handler)
