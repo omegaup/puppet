@@ -77,17 +77,6 @@ class omegaup::developer_environment (
     path     => "${root}/frontend/server/config.php",
     require  => Config_php['default settings'],
   }
-  file { "${root}/frontend/tests/controllers/omegaup.log":
-    ensure => 'file',
-    owner  => $user,
-    group  => $user,
-  }
-  file { ["${root}/frontend/tests/controllers/problems",
-      "${root}/frontend/tests/controllers/submissions"]:
-    ensure => 'directory',
-    owner  => $user,
-    group  => $user,
-  }
   file { '/tmp/omegaup':
     ensure => 'directory',
     owner  => $user,
