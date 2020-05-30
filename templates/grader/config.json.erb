@@ -4,7 +4,7 @@
 	},
 	"DB": {
 		"Driver": "mysql",
-		"DataSourceName": "<%= @mysql_user %>:<%= @mysql_password %>@<% if @mysql_host != "localhost" %>(<%= @mysql_host %>:3306)<% end %>/<%= @mysql_db %>"
+		"DataSourceName": "<%= @mysql_user %>:<%= @mysql_password %>@<% if @mysql_host != "localhost" %>(<%= @mysql_host %>:3306)<% end %>/<%= @mysql_db %>?parseTime=true"
 	},
 	"Metrics": {
 		"Port": 6061
