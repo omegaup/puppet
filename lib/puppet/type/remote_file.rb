@@ -30,7 +30,6 @@ Puppet::Type.newtype(:remote_file) do
 
   newparam(:sha1hash) do
     desc "SHA1 hash of the file"
-    isrequired
   end
 
   newproperty(:mode) do
