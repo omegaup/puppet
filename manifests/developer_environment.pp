@@ -8,9 +8,9 @@ class omegaup::developer_environment (
   $mysql_password,
 ) {
   # Packages
-  package { [ 'vim', 'openssh-client', 'gcc', 'g++', 'python-pip',
-              'python3-six', 'python-six', 'silversearcher-ag', 'libgconf-2-4',
-              'ca-certificates', 'meld', 'vim-gtk', 'yarn', 'nodejs',
+  package { [ 'vim', 'openssh-client', 'gcc', 'g++', 'python3-six',
+             'python-six', 'silversearcher-ag', 'libgconf-2-4',
+             'ca-certificates', 'meld', 'vim-gtk', 'yarn', 'nodejs',
               'docker.io']:
     ensure  => present,
   }
@@ -25,9 +25,6 @@ class omegaup::developer_environment (
     auto_update => false,
     path        => '/usr/bin/phpunit',
   } -> Anchor['php::end']
-  package { 'closure-linter':
-    provider => pip,
-  }
   package { 'pycodestyle':
     ensure   => '2.5.0',
     provider => pip3,
