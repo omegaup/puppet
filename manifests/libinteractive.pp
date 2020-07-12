@@ -4,8 +4,7 @@ class omegaup::libinteractive () {
     ensure => installed,
   }
   remote_file { '/usr/share/java/libinteractive.jar':
-    url      => 'https://github.com/omegaup/libinteractive/releases/download/v2.0.25/libinteractive.jar',
-    sha1hash => '9c70b4cfe7a94843c3fa62e398da82029fd15724',
+    url      => 'https://github.com/omegaup/libinteractive/releases/download/v2.0.27/libinteractive.jar',
     mode     => '644',
     owner    => 'root',
     group    => 'root',
