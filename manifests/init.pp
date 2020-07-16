@@ -10,6 +10,7 @@ class omegaup (
   $gitserver_shared_token = undef,
   $grader_host = 'https://localhost:21680',
   $hostname = 'localhost',
+  $http_port = 80,
   $local_database = false,
   $database_migration_args = [],
   $mysql_host = 'localhost',

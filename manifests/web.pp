@@ -4,6 +4,7 @@ class omegaup::web(
   $development_environment = false,
   $default_server = true,
   $hostname = 'localhost',
+  $http_port = 80,
   $include_files = [],
   $php_version = $::lsbdistcodename ? {
     'bionic' => '7.2',
@@ -37,6 +38,7 @@ class omegaup::web(
     default_server => $default_server,
     include_files  => $include_files,
     hostname       => $hostname,
+    http_port      => $http_port,
     ssl            => $ssl,
     try_files      => $try_files,
     web_root       => $web_root,

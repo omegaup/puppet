@@ -12,6 +12,7 @@ class omegaup::web_app(
   $gitserver_shared_token = $::omegaup::gitserver_shared_token,
   $grader_host = $::omegaup::grader_host,
   $hostname = $::omegaup::hostname,
+  $http_port = $::omegaup::http_port,
   $mysql_host = $::omegaup::mysql_host,
   $mysql_password = $::omegaup::mysql_password,
   $mysql_user = $::omegaup::mysql_user,
@@ -80,7 +81,7 @@ class omegaup::web_app(
   }
   $omegaup_url = $ssl ? {
         true  => "https://${hostname}",
-        false => "http://${hostname}",
+        false => "http://${hostname}:${http_port}",
   }
   $omegaup_gitserver_secret_token = $gitserver_shared_token ? {
         undef   => '',
@@ -118,6 +119,7 @@ class omegaup::web_app(
   class { '::omegaup::web':
     development_environment => $development_environment,
     hostname                => $hostname,
+    http_port               => $http_port,
     include_files           => ['/etc/nginx/sites-available/omegaup.com-nginx_rewrites.conf'],
     php_max_children        => $php_max_children,
     php_max_requests        => $php_max_requests,

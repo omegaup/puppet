@@ -27,7 +27,9 @@ class { '::omegaup':
   gitserver_shared_token  => 'gitserversharedtoken',
   require                 => [Class['::omegaup::database']],
 }
-class { '::omegaup::web_app': }
+class { '::omegaup::web_app':
+  http_port => 8001,
+}
 
 class { '::omegaup::cron':
   mysql_password => 'omegaup',

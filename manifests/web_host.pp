@@ -8,6 +8,7 @@ define omegaup::web_host(
   $try_files = undef,
   $ssl = false,
   $php = true,
+  $http_port = 80,
 ) {
   $nginx_server = $ssl ? {
     true  => "${hostname}-ssl",
@@ -31,7 +32,7 @@ define omegaup::web_host(
     nginx::resource::server { $hostname:
       ensure        => present,
       index_files   => [],
-      listen_port   => 80,
+      listen_port   => $http_port,
       rewrite_rules => ["^ https://${hostname}\$request_uri permanent"],
       server_name   => [$hostname],
       require       => File['/etc/nginx/conf.d/default.conf'],
@@ -75,7 +76,7 @@ define omegaup::web_host(
     nginx::resource::server { $hostname:
       ensure               => present,
       server_name          => [$hostname],
-      listen_port          => 80,
+      listen_port          => $http_port,
       listen_options       => $listen_options,
       index_files          => $index_files,
       include_files        => $include_files,
