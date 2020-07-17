@@ -40,13 +40,6 @@ class omegaup::web_app(
     remotes => $github_remotes,
     require => [File[$root], Package['git']],
   }
-  file { "${root}/.git/hooks/pre-push":
-    ensure  => 'link',
-    target  => "${root}/stuff/git-hooks/pre-push",
-    owner   => $user,
-    group   => $user,
-    require => Github[$root],
-  }
 
   # Web application
   file { '/var/log/omegaup/omegaup.log':

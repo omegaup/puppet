@@ -166,6 +166,22 @@ class omegaup::developer_environment (
     require     => [Github[$root], Exec['getcomposer']],
   }
 
+  # git hooks
+  file { "${root}/.git/hooks/pre-push":
+    ensure  => 'link',
+    target  => "../../stuff/git-hooks/pre-push",
+    owner   => $user,
+    group   => $user,
+    require => Github[$root],
+  }
+  file { "${root}/.git/hooks/post-checkout":
+    ensure  => 'link',
+    target  => "../../stuff/git-hooks/post-checkout",
+    owner   => $user,
+    group   => $user,
+    require => Github[$root],
+  }
+
   # hook_tools
   docker::image { 'omegaup/hook_tools':
     image_tag => 'latest',
