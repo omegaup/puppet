@@ -38,9 +38,11 @@ Puppet::Type.type(:remote_file).provide(:git, :parent => Puppet::Provider::Remot
   end
 
   def create
-    execute([command(:curl), '--location', '--output', @resource[:path],
-             '--silent', '--remote-time', @resource[:url]],
+    tmp_path = @resource[:path] + '.tmp'
+    execute([command(:curl), '--location', '--output', tmp_path,
+             '--silent', '--fail', '--remote-time', @resource[:url]],
             { :failonfail => true, :uid => uid, :gid => gid })
+    File.rename(tmp_path, @resource[:path])
     # Make sure the mode is correct
     should_mode = @resource.should(:mode)
     unless self.mode == should_mode
