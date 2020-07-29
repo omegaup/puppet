@@ -99,9 +99,8 @@ class omegaup::web_app(
     require  => Github[$root],
   }
   package { 'awscli':
-    ensure   => 'latest',
+    ensure   => 'absent',
     provider => pip3,
-    require  => Package['python3-pip'],
   }
   file { '/etc/nginx/sites-available/omegaup.com-nginx_rewrites.conf':
     content => template('omegaup/web_app/nginx.rewrites.erb'),
