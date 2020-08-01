@@ -1,3 +1,8 @@
+class { '::php::globals':
+  php_version => '7.4',
+  config_root => '/etc/php/7.4',
+}
+
 class { '::omegaup::apt_sources':
   development_environment => true,
 }
