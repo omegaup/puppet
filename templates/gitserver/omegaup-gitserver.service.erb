@@ -1,7 +1,7 @@
 [Unit]
 Description=omegaUp git service
-After=network.target<% if @local_database %> mysql.service<% end %>
-<% if @local_database %>Requires=mysql.service<% end %>
+After=network.target<% if @local_database %> mysql.service nginx.service php7.4-fpm.service<% end %>
+<% if @local_database %>Requires=mysql.service nginx.service php7.4-fpm.service<% end %>
 
 [Service]
 Type=notify

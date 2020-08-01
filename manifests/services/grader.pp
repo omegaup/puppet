@@ -6,7 +6,7 @@ class omegaup::services::grader (
   $broadcaster_host = 'https://localhost:32672',
   $frontend_host = 'http://localhost',
   $keystore_password = 'omegaup',
-  $local_database = true,
+  $local_database = false,
   $mysql_db = 'omegaup',
   $mysql_host = 'localhost',
   $mysql_password = undef,

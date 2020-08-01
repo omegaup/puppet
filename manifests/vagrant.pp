@@ -49,11 +49,13 @@ class { '::omegaup::services::grader':
   keystore_password => 'omegaup',
   mysql_password    => 'omegaup',
   user              => 'vagrant',
+  local_database    => true,
   require           => [Omegaup::Certmanager::Cert['/etc/omegaup/grader/key.pem'],
                         Class['::omegaup::services']],
 }
 class { '::omegaup::services::gitserver':
   mysql_password    => 'omegaup',
+  local_database    => true,
 }
 class { '::omegaup::services::runner':
   keystore_password => 'omegaup',
