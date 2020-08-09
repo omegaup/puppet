@@ -10,7 +10,7 @@ class omegaup::services::runner (
   include omegaup::directories
 
   remote_file { '/var/lib/omegaup/omegaup-runner.tar.xz':
-    url      => 'https://github.com/omegaup/quark/releases/download/v1.1.27/omegaup-runner.tar.xz',
+    url      => 'https://github.com/omegaup/quark/releases/download/v1.1.40/omegaup-runner.tar.xz',
     sha1hash => '3dbc98b643a699719f2f9b02ec32c51cec2b4a48',
     mode     => '644',
     owner    => 'root',
@@ -40,29 +40,27 @@ class omegaup::services::runner (
   file { '/var/lib/omegaup/omegajail-xenial-distrib-x86_64.tar.bz2':
     ensure => absent,
   }
-  remote_file { '/var/lib/omegaup/omegajail-bionic-distrib-x86_64.tar.xz':
-    url      => 'https://omegaup-omegajail.s3.amazonaws.com/omegajail-bionic-distrib-x86_64.tar.xz',
-    sha1hash => '10b1762cf07c189bf01701e6c23396313f69f087',
+  remote_file { '/var/lib/omegaup/omegajail-focal-distrib-x86_64.tar.xz':
+    url      => 'https://github.com/omegaup/omegajail/releases/download/v3.0.1/omegajail-focal-distrib-x86_64.tar.xz',
     mode     => '644',
     owner    => 'root',
     group    => 'root',
     require  => File['/var/lib/omegaup'],
   }
-  remote_file { '/var/lib/omegaup/omegajail-bionic-rootfs-x86_64.tar.xz':
-    url      => 'https://omegaup-omegajail.s3.amazonaws.com/omegajail-bionic-rootfs-x86_64.tar.xz',
-    sha1hash => '490b126d5248e6601d5c12a3b437e26a7191516c',
+  remote_file { '/var/lib/omegaup/omegajail-focal-rootfs-x86_64.tar.xz':
+    url      => 'https://github.com/omegaup/omegajail/releases/download/v3.0.0/omegajail-focal-rootfs-x86_64.tar.xz',
     mode     => '644',
     owner    => 'root',
     group    => 'root',
     require  => File['/var/lib/omegaup'],
   }
   exec { 'omegajail-distrib':
-    command     => '/bin/rm -rf /var/lib/omegajail && /bin/tar -xf /var/lib/omegaup/omegajail-bionic-rootfs-x86_64.tar.xz -C / && /bin/tar -xf /var/lib/omegaup/omegajail-bionic-distrib-x86_64.tar.xz -C /',
+    command     => '/bin/rm -rf /var/lib/omegajail && /bin/tar -xf /var/lib/omegaup/omegajail-focal-rootfs-x86_64.tar.xz -C / && /bin/tar -xf /var/lib/omegaup/omegajail-focal-distrib-x86_64.tar.xz -C /',
     user        => 'root',
     notify      => File['/var/lib/omegajail/bin/omegajail'],
     subscribe   => [
-      Remote_File['/var/lib/omegaup/omegajail-bionic-rootfs-x86_64.tar.xz'],
-      Remote_File['/var/lib/omegaup/omegajail-bionic-distrib-x86_64.tar.xz'],
+      Remote_File['/var/lib/omegaup/omegajail-focal-rootfs-x86_64.tar.xz'],
+      Remote_File['/var/lib/omegaup/omegajail-focal-distrib-x86_64.tar.xz'],
     ],
     refreshonly => true,
   }
