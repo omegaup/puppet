@@ -156,6 +156,33 @@ class omegaup::web_app(
     ],
     refreshonly => true,
   }
+  remote_file { '/var/lib/omegaup/jdk-14.0.2_doc-all.zip':
+    url      => 'https://omegaup-dist.s3.amazonaws.com/jdk-14.0.2_doc-all.zip',
+    mode     => '644',
+    owner    => 'root',
+    group    => 'root',
+    notify   => Exec['extract-openjdk-docs'],
+    require  => File['/var/lib/omegaup'],
+  }
+  file { '/var/www/omegaup.com/docs/java':
+    ensure  => 'directory',
+    owner   => 'www-data',
+    group   => 'www-data',
+    require => [
+      User['www-data'],
+      File['/var/www/omegaup.com/docs'],
+    ],
+  }
+  exec { 'extract-openjdk-docs':
+    command     => '/bin/rm -rf /var/www/omegaup.com/docs/java/en ; /usr/bin/unzip /var/lib/omegaup/jdk-14.0.2_doc-all.zip -d /var/www/omegaup.com/docs/java && /bin/mv /var/www/omegaup.com/docs/java/docs /var/www/omegaup.com/docs/java/en',
+    user        => 'www-data',
+    require     => [
+      Remote_File['/var/lib/omegaup/jdk-14.0.2_doc-all.zip'],
+      File['/var/www/omegaup.com/docs/java'],
+      User['www-data'],
+    ],
+    refreshonly => true,
+  }
   remote_file { '/var/lib/omegaup/freepascal-doc.tar.gz':
     url      => 'ftp://ftp.hu.freepascal.org/pub/fpc/dist/3.0.2/docs/doc-html.tar.gz',
     sha1hash => 'b9b9dc3d624d3dd2699e008aa10bd0181d2bda77',
