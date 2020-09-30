@@ -66,7 +66,8 @@ class omegaup::web_app(
     require => [File['/var/www'], Github[$root]],
   }
   file { ["${root}/frontend/www/img",
-          "${root}/frontend/www/templates"]:
+          "${root}/frontend/www/templates",
+          "${root}/frontend/www/probleminput"]:
     ensure  => 'directory',
     owner   => 'www-data',
     group   => 'www-data',
