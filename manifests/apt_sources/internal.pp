@@ -79,6 +79,7 @@ class omegaup::apt_sources::internal (
     apt::source { 'newrelic-infra':
       location     => 'https://download.newrelic.com/infrastructure_agent/linux/apt',
       architecture => 'amd64',
+      release      => 'bionic',
       include      => {
         src          => false,
       },
