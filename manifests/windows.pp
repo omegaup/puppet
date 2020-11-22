@@ -33,11 +33,12 @@ file { ['/etc/omegaup/frontend', '/etc/omegaup/grader']:
   ensure  => 'directory',
   require => File['/etc/omegaup'],
 }
-omegaup::certmanager::cert { '/etc/omegaup/frontend/certificate.pem':
+omegaup::certmanager::cert { '/etc/omegaup/frontend/key.pem':
   hostname => 'localhost',
   mode     => '600',
   owner    => 'www-data',
   require  => [File['/etc/omegaup/frontend'], User['www-data']],
+  separate_cert => '/etc/omegaup/frontend/certificate.pem',
 }
 
 class { '::omegaup':

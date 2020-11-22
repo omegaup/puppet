@@ -18,11 +18,12 @@ class { '::omegaup::certmanager': }
 file { '/etc/omegaup/frontend':
   ensure  => 'directory',
   require => File['/etc/omegaup'],
-} -> omegaup::certmanager::cert { '/etc/omegaup/frontend/certificate.pem':
+} -> omegaup::certmanager::cert { '/etc/omegaup/frontend/key.pem':
   hostname => 'localhost',
   owner    => 'www-data',
   mode     => '600',
   require  => User['www-data'],
+  separate_cert => '/etc/omegaup/frontend/certificate.pem',
 }
 class { '::omegaup':
   development_environment => true,

@@ -89,8 +89,6 @@ class omegaup::web_app(
       'OMEGAUP_DB_PASS'                => $mysql_password,
       'OMEGAUP_DB_NAME'                => 'omegaup',
       'OMEGAUP_URL'                    => $omegaup_url,
-      'OMEGAUP_SSLCERT_URL'            => '/etc/omegaup/frontend/certificate.pem',
-      'OMEGAUP_CACERT_URL'             => '/etc/omegaup/frontend/certificate.pem',
       'OMEGAUP_GRADER_URL'             => $grader_host,
       'OMEGAUP_GITSERVER_SECRET_TOKEN' => $omegaup_gitserver_secret_token,
     }, $additional_php_config_settings),

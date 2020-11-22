@@ -9,11 +9,12 @@ host { 'localhost':
 file { '/etc/omegaup/frontend':
   ensure  => 'directory',
   require => File['/etc/omegaup'],
-} -> omegaup::certmanager::cert { '/etc/omegaup/frontend/certificate.pem':
+} -> omegaup::certmanager::cert { '/etc/omegaup/frontend/key.pem':
+  hostname => hiera('omegaup_hostname'),
   owner    => 'www-data',
   mode     => '600',
   require  => User['www-data'],
-  hostname => hiera('omegaup_hostname'),
+  separate_cert => '/etc/omegaup/frontend/certificate.pem',
 }
 class { '::omegaup::apt_sources':
   use_newrelic            => true,

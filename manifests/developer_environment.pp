@@ -59,8 +59,6 @@ class omegaup::developer_environment (
       'OMEGAUP_DB_HOST'     => $mysql_host,
       'OMEGAUP_DB_PASS'     => $mysql_password,
       'OMEGAUP_DB_NAME'     => 'omegaup-test',
-      'OMEGAUP_SSLCERT_URL' => '/etc/omegaup/frontend/certificate.pem',
-      'OMEGAUP_CACERT_URL'  => '/etc/omegaup/frontend/certificate.pem',
     },
     path     => "${root}/frontend/tests/test_config.php",
     owner    =>  $user,
