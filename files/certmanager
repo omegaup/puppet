@@ -4,7 +4,6 @@ PASSWORD=omegaup
 C=MX
 CA_NAME=
 HOSTNAME=
-IP_ADDR=0
 OUTPUT=
 CERT_OUTPUT=
 ROOT=ssl
@@ -31,19 +30,25 @@ gen_cert() {
 	TARGET=$2
 	CERT_TARGET=$3
 	FORMAT=${TARGET##*.}
-	DIR=`mktemp -d`
+	DIR=`mktemp -d certmanager.XXXXXXXXXX`
 
-	if [ -n "${TARGET}" && -f "${TARGET}" ]; then
+	if [[ -n "${TARGET}" && -f "${TARGET}" ]]; then
 		rm "${TARGET}"
 	fi
-	if [ -n "${CERT_TARGET}" && -f "${CERT_TARGET}" ]; then
+	if [[ -n "${CERT_TARGET}" && -f "${CERT_TARGET}" ]]; then
 		rm "${CERT_TARGET}"
 	fi
 
 	/usr/bin/openssl genrsa -out "${DIR}/cert.key" 2048
-	if [ "${IP_ADDR}" -eq 1 ]; then
-		/usr/bin/openssl req -new -key $\DIR/cert.key -out ${DIR}/cert.csr \
-			-config <(
+	subject_alt_name=""
+	if [[ "${CN}" =~ ^[0-9]+(\.[0-9]+){3}$ ]]; then
+		subject_alt_name="subjectAltName=IP:${CN}"
+	else
+		subject_alt_name="subjectAltName=DNS:${CN}"
+	fi
+
+	/usr/bin/openssl req -new -key "${DIR}/cert.key" -out "${DIR}/cert.csr" \
+		-config <(
 cat <<EOF
 [req]
 default_bits=2048
@@ -52,31 +57,21 @@ default_md=sha1
 req_extensions=req_ext
 distinguished_name=dn
 [dn]
-C=$C
-CN=$CN
+C=${C}
+CN=${CN}
 [req_ext]
-subjectAltName=IP:$CN
+${subject_alt_name}
 EOF
-		)
-	else
-		/usr/bin/openssl req -new -subj "/C=$C/CN=$CN" -key "${DIR}/cert.key" \
-			-out "${DIR}/cert.csr"
-	fi
+	)
 
-	if [ "${IP_ADDR}" -eq 1 ]; then
-		/usr/bin/openssl x509 -req -days 3650 -in "${DIR}/cert.csr" \
-			-CA "${ROOT}/ca.crt" -CAcreateserial -CAkey "${ROOT}/ca.key" \
-			-out "${DIR}/cert.crt" -extensions req_ext -extfile <(
+	/usr/bin/openssl x509 -req -days 3650 -in "${DIR}/cert.csr" \
+		-CA "${ROOT}/ca.crt" -CAcreateserial -CAkey "${ROOT}/ca.key" \
+		-out "${DIR}/cert.crt" -extensions req_ext -extfile <(
 cat <<EOF
 [req_ext]
-subjectAltName=IP:${CN}
+${subject_alt_name}
 EOF
-		)
-	else
-		/usr/bin/openssl x509 -req -days 3650 -in "${DIR}/cert.csr" \
-			-CA "${ROOT}/ca.crt" -CAcreateserial -CAkey "${ROOT}/ca.key" \
-			-out "${DIR}/cert.crt"
-	fi
+	)
 
 	if [ -n "${CERT_TARGET}" ]; then
 		cp "${DIR}/cert.key" "${TARGET}"
@@ -129,7 +124,6 @@ while [[ $# > 1 ]]; do
 			;;
 		-h|--hostname)
 			HOSTNAME="$1"
-			IP_ADDR=`echo "${HOSTNAME}" | grep '^[0-9]\+\(\.[0-9]\+\)\{3\}$' | wc -l`
 			shift || usage
 			;;
 		-o|--output)
