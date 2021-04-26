@@ -1,9 +1,8 @@
 #!/bin/bash -e
 
-PASSWORD=omegaup
 C=MX
 CA_NAME=
-HOSTNAME=
+HOSTNAME=()
 OUTPUT=
 CERT_OUTPUT=
 ROOT=ssl
@@ -15,7 +14,6 @@ usage() {
 	echo -e "\t\tcert\tCreates a cert truststore. Requires --hostname and --output."
 	echo -e "\tWhere [options] are one or more of:"
 	echo -e "\t\t--root\tSets the path where the ca.crt and ca.seq files are stored"
-	echo -e "\t\t--password\tSets the store password"
 	echo -e "\t\t--ca-name\tSets the Certificate Authority name"
 	echo -e "\t\t--country\tSets the country"
 	echo -e "\t\t--hostname\tSets the hostname of the cert"
@@ -26,79 +24,89 @@ usage() {
 }
 
 gen_cert() {
-	CN=$1
-	TARGET=$2
-	CERT_TARGET=$3
-	FORMAT=${TARGET##*.}
-	DIR=`mktemp -d certmanager.XXXXXXXXXX`
+	local target="$1"
+	shift
+	local cert_target="$1"
+	shift
+	local server_names=("$@")
+	local common_name="${server_names[0]}"
+	local dir=`mktemp -d certmanager.XXXXXXXXXX`
 
-	if [[ -n "${TARGET}" && -f "${TARGET}" ]]; then
-		rm "${TARGET}"
+	if [[ -n "${target}" && -f "${target}" ]]; then
+		rm "${target}"
 	fi
-	if [[ -n "${CERT_TARGET}" && -f "${CERT_TARGET}" ]]; then
-		rm "${CERT_TARGET}"
-	fi
-
-	/usr/bin/openssl genrsa -out "${DIR}/cert.key" 2048
-	subject_alt_name=""
-	if [[ "${CN}" =~ ^[0-9]+(\.[0-9]+){3}$ ]]; then
-		subject_alt_name="subjectAltName=IP:${CN}"
-	else
-		subject_alt_name="subjectAltName=DNS:${CN}"
+	if [[ -n "${cert_target}" && -f "${cert_target}" ]]; then
+		rm "${cert_target}"
 	fi
 
-	/usr/bin/openssl req -new -key "${DIR}/cert.key" -out "${DIR}/cert.csr" \
+	/usr/bin/openssl ecparam -name prime256v1 -genkey -noout -out "${dir}/cert.key"
+	local subject_alt_names=""
+	for index in "${!server_names[@]}"; do
+		local server_name="${server_names[index]}"
+		if [[ "${server_name}" =~ ^[0-9]+(\.[0-9]+){3}$ ]]; then
+			subject_alt_names="${subject_alt_names}IP.${index}=${server_name}
+"
+		else
+			subject_alt_names="${subject_alt_names}DNS.${index}=${server_name}
+"
+		fi
+	done
+
+	/usr/bin/openssl req -new -key "${dir}/cert.key" -out "${dir}/cert.csr" \
 		-config <(
 cat <<EOF
 [req]
-default_bits=2048
 prompt=no
-default_md=sha1
+default_md=sha256
 req_extensions=req_ext
 distinguished_name=dn
 [dn]
 C=${C}
-CN=${CN}
+CN=${common_name}
 [req_ext]
-${subject_alt_name}
+subjectAltName=@alt_names
+[alt_names]
+${subject_alt_names}
 EOF
 	)
 
-	/usr/bin/openssl x509 -req -days 3650 -in "${DIR}/cert.csr" \
+	/usr/bin/openssl x509 -req -days 3650 -in "${dir}/cert.csr" \
 		-CA "${ROOT}/ca.crt" -CAcreateserial -CAkey "${ROOT}/ca.key" \
-		-out "${DIR}/cert.crt" -extensions req_ext -extfile <(
+		-out "${dir}/cert.crt" -extensions req_ext -extfile <(
 cat <<EOF
 [req_ext]
-${subject_alt_name}
+subjectAltName=@alt_names
+[alt_names]
+${subject_alt_names}
 EOF
 	)
 
-	if [ -n "${CERT_TARGET}" ]; then
-		cp "${DIR}/cert.key" "${TARGET}"
-		cat "${DIR}/cert.crt" "${ROOT}/ca.crt" > "${CERT_TARGET}"
+	if [ -n "${cert_target}" ]; then
+		cp "${dir}/cert.key" "${target}"
+		cat "${dir}/cert.crt" "${ROOT}/ca.crt" > "${cert_target}"
 	else
-		cat "${DIR}/cert.key" "${DIR}/cert.crt" "${ROOT}/ca.crt" > "${TARGET}"
+		cat "${dir}/cert.key" "${dir}/cert.crt" "${ROOT}/ca.crt" > "${target}"
 	fi
 
-	SERIAL=`openssl x509 -in "${DIR}/cert.crt" -noout -serial | \
+	local serial=`openssl x509 -in "${dir}/cert.crt" -noout -serial | \
 		sed -e 's/serial=//'`
 
-	cp "${DIR}/cert.key" "${ROOT}/${CN}-${SERIAL}.key"
-	cp "${DIR}/cert.crt" "${ROOT}/${CN}-${SERIAL}.crt"
+	cp "${dir}/cert.key" "${ROOT}/${common_name}-${serial}.key"
+	cp "${dir}/cert.crt" "${ROOT}/${common_name}-${serial}.crt"
 
-	rm -rf "${DIR}"
+	rm -rf "${dir}"
 }
 
 gen_ca() {
-	CN=$1
+	local common_name="$1"
 
 	if [ -d "${ROOT}" ]; then
 		rm -rf ${ROOT}/*
 	fi
 
 	mkdir -p "${ROOT}"
-	/usr/bin/openssl genrsa -out "${ROOT}/ca.key" 4096
-	/usr/bin/openssl req -new -subj "/C=${C}/CN=${CN}" -x509 -days 3650 \
+	/usr/bin/openssl ecparam -name prime256v1 -genkey -noout -out "${ROOT}/ca.key"
+	/usr/bin/openssl req -new -sha256 -subj "/C=${C}/CN=${common_name}" -x509 -days 3560 \
 		-key "${ROOT}/ca.key" -out "${ROOT}/ca.crt"
 }
 
@@ -110,10 +118,6 @@ while [[ $# > 1 ]]; do
 	shift
 
 	case $KEY in
-		-p|--password)
-			PASSWORD="$1"
-			shift || usage
-			;;
 		-c|--ca-name)
 			CA_NAME="$1"
 			shift || usage
@@ -123,7 +127,7 @@ while [[ $# > 1 ]]; do
 			shift || usage
 			;;
 		-h|--hostname)
-			HOSTNAME="$1"
+			HOSTNAME+=("$1")
 			shift || usage
 			;;
 		-o|--output)
@@ -152,10 +156,10 @@ case "${COMMAND}" in
 		gen_ca "${CA_NAME}"
 		;;
 	cert)
-		if [ \( "${HOSTNAME}" == "" \) -o \( "${OUTPUT}" == "" \) ] ; then
+		if [ \( "${#HOSTNAME[@]}" == "" \) -o \( "${OUTPUT}" == "" \) ] ; then
 			usage
 		fi
-		gen_cert "${HOSTNAME}" "${OUTPUT}" "${CERT_OUTPUT}"
+		gen_cert "${OUTPUT}" "${CERT_OUTPUT}" "${HOSTNAME[@]}"
 		;;
 	*)
 		usage
