@@ -4,7 +4,7 @@ class omegaup (
   $broadcaster_host = 'http://localhost:39613',
   $development_environment = false,
   $github_ensure = present,
-  $github_branch = 'master',
+  $github_branch = 'main',
   $github_repo = 'omegaup/omegaup',
   $github_remotes = {},
   $gitserver_shared_token = undef,

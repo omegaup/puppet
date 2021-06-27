@@ -4,7 +4,7 @@ class omegaup::services::webhook (
   $github_webhook_secret = undef,
   $github_branch = defined('$::omegaup::github_branch') ? {
     true  => $::omegaup::github_branch,
-    false => 'master',
+    false => 'main',
   },
   $force_database_migration = false,
   $hostname = undef,

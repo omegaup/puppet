@@ -42,7 +42,7 @@ Puppet::Type.newtype(:github) do
 
   newparam(:branch) do
     desc "The branch to clone"
-    defaultto 'master'
+    defaultto 'main'
   end
 
   newparam(:remotes) do

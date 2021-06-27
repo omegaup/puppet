@@ -3,7 +3,7 @@
 MODULEPATH="$(/usr/bin/puppet config print modulepath | sed -e 's/.*://')/omegaup"
 
 # Update the Puppet files
-(cd "${MODULEPATH}" && git pull --rebase origin master)
+(cd "${MODULEPATH}" && git pull --rebase origin main)
 
 # Apply the latest changes.
 puppet apply --detailed-exitcodes --disable_warnings=deprecations \
