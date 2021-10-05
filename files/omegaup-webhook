@@ -280,6 +280,7 @@ class DeployThread(threading.Thread):
                 commit, deployment_id = payload
                 logging.info('Deploying %s...', commit)
                 logpath = os.path.join(_WEBHOOK_ROOT, commit[:2], commit[2:])
+                os.makedirs(os.path.dirname(logpath), exist_ok=True)
                 with open(logpath, 'w') as logfile:
                     log = logging.getLogger(commit)
                     log.propagate = True
@@ -291,7 +292,6 @@ class DeployThread(threading.Thread):
                                               'Starting deployment on %s' %
                                               (_HOSTNAME, ),
                                               log=log)
-                        os.makedirs(os.path.dirname(logpath), exist_ok=True)
                         res = subprocess.run([
                             '/usr/bin/sudo',
                             '/usr/bin/omegaup-deploy-latest',
