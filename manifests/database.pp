@@ -19,6 +19,8 @@ class omegaup::database (
     password => $password,
     host     => 'localhost',
     grant    => ['SELECT', 'INSERT', 'UPDATE', 'DELETE'],
+    charset  => 'utf8mb4',
+    collate  => 'utf8mb4_unicode_ci',
   }
 
   if $development_environment {
@@ -27,6 +29,8 @@ class omegaup::database (
       password => $password,
       host     => 'localhost',
       grant    => ['SELECT', 'INSERT', 'UPDATE', 'DELETE', 'DROP', 'ALTER'],
+      charset  => 'utf8mb4',
+      collate  => 'utf8mb4_unicode_ci',
     }
   }
 }
