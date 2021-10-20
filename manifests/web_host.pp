@@ -52,7 +52,10 @@ define omegaup::web_host(
       include_files        => $include_files,
       gzip_types           => $gzip_types,
       error_pages          => {
+        400 => '/400.html',
         404 => '/404.html',
+        500 => '/500.html',
+        503 => '/503.html',
       },
       client_max_body_size => '100m',
       server_cfg_prepend   => {
@@ -81,7 +84,10 @@ define omegaup::web_host(
       index_files          => $index_files,
       include_files        => $include_files,
       error_pages          => {
+        400 => '/400.html',
         404 => '/404.html',
+        500 => '/500.html',
+        503 => '/503.html',
       },
       client_max_body_size => '100m',
       server_cfg_prepend   => {
