@@ -45,9 +45,14 @@ class omegaup::new_relic (
     so_name         => 'newrelic',
     settings_prefix => 'newrelic/newrelic',
     settings        => {
-      license                              => "\"${license_key}\"",
-      appname                              => "\"${hostname}\"",
-      'browser_monitoring.auto_instrument' => false,
+      license                                       => "\"${license_key}\"",
+      appname                                       => "\"${hostname}\"",
+      'browser_monitoring.auto_instrument'          => false,
+      'distributed_tracing_enabled'                 => true,
+      'distributed_tracing_exclude_newrelic_header' => 1,
+      'span_events_enabled'                         => true,
+      'transaction_tracer.enabled'                  => true,
+      'transaction_tracer.threshold'                => 0,
     },
   } -> file { '/usr/lib/php/20190902/newrelic.so':
     ensure => link,
